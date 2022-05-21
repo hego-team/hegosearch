@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-->mapper根节点<-->
+<mapper namespace="com.bytedance.hego.mapper.UserMapper">
+
+    <sql id="Base_Column_List">
+        uid as id,
+        name,
+        age,
+        email,
+ create_time as createTime,
+         data_time as updadeTime,
+        is_deleted as deleted
+    </sql>
+    <select id="selectAllByName" resultType="com.bytedance.hego.entity.User">
+    select  <include refid="Base_Column_List"/>
+    from user
+    where name=#{name}
+</select>
+
+    <select id="selectPageByAge" resultType="com.bytedance.hego.entity.User">
+        <!--查询年龄大于age的所有用户，并且分页展示.分页不用写，只要在接口当中传递了page对象就可以了-->
+        <!--分页不用写，只要在接口当中传递了page对象就可以了-->
+        select <include refid="Base_Column_List"></include>
+        from user
+        where age>#{age} and is_deleted=0
+    </select>
+</mapper>
