@@ -1,6 +1,7 @@
 package com.bytedance.hego.service;
 
 import com.bytedance.hego.entity.Document;
+import com.bytedance.hego.entity.Page;
 import com.bytedance.hego.entity.SearchResult;
 import com.bytedance.hego.util.HegoUtil;
 import com.bytedance.hego.util.LevelDBUtil;
@@ -92,7 +93,12 @@ public class SearchService {
         return docs;
     }
 
-    public SearchResult findDocsByQuery(String query) {
+    /**
+     * 根据query与page查询document
+     * @param query
+     * @return
+     */
+    public SearchResult findDocsByQuery(String query, int current) {
 
         // 将query清洗分词得到keywords
         List<String> keywords = this.tokenizeQuery(query);
@@ -100,13 +106,24 @@ public class SearchService {
         Map<Integer, Float> ids = this.findIdsByKeywords(keywords);
         // 将docIds按score排序
         List<Integer> rankIds = this.rankIdsByScore(ids);
+
+        // 提取当前页的docIds
+        Page page = new Page();
+        page.setCurrent(current);
+        page.setRows(rankIds.size());
+        // 当前页的起止document
+        int start = page.getStart();
+        int end = page.getEnd();
+        List<Integer> pageIds = rankIds.subList(start, end);
+
         // 根据docIds查询documents
-        List<Document> documents = this.findDocsByIds(rankIds);
+        List<Document> documents = this.findDocsByIds(pageIds);
 
         //将查询到的documents封装进searchResult
         SearchResult searchResult = new SearchResult();
         searchResult.setDocuments(documents);
-        searchResult.setTotal(documents.size());
+        searchResult.setTotal(ids.size());
+        searchResult.setPage(page);
 
         return searchResult;
     }

@@ -96,7 +96,7 @@ public class ServiceTest {
     @Test
     void testFindDocsByQuery() {
         String query = "医院患者";
-        SearchResult searchResult = searchService.findDocsByQuery(query);
+        SearchResult searchResult = searchService.findDocsByQuery(query, 2);
         System.out.println(searchResult);
     }
 
