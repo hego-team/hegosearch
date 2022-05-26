@@ -82,11 +82,15 @@ public class ServiceTest {
     @Test
     void testFindDocsByIds() {
         List<Integer> ids = new ArrayList<Integer>();
-        ids.add(0);
+        // ids.add(0);
         ids.add(1);
         ids.add(2);
+        List<String> keywords = new ArrayList<>();
+        keywords.add("医院");
+        keywords.add("患者");
+        keywords.add("文章");
 
-        List<Document> docs = searchService.findDocsByIds(ids);
+        List<Document> docs = searchService.findDocsByIds(ids, keywords);
         System.out.println(docs);
     }
 

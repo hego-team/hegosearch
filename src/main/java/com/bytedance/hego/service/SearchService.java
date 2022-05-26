@@ -83,13 +83,26 @@ public class SearchService {
      * @param ids
      * @return documents list
      */
-    public List<Document> findDocsByIds(List<Integer> ids) {
+    public List<Document> findDocsByIds(List<Integer> ids, List<String> keywords) {
         List<Document> docs = new ArrayList<>();
         for (Integer id: ids) {
             Document doc = levelDBUtil.getDoc(Integer.toString(id));
+
+            // 处理关键词高亮
+            String text = doc.getContent();
+            StringBuilder tmp = new StringBuilder(text);
+            for (String keyword: keywords) {
+                if (tmp.indexOf(keyword) != -1) {
+                    hegoUtil.replaceAll(tmp, keyword, "<em>" + keyword + "</em>");
+                }
+            }
+            String hightlightText = tmp.toString();
+
+            doc.setContent(hightlightText);
             doc.setDocId(id);
             docs.add(doc);
         }
+
         return docs;
     }
 
@@ -130,7 +143,7 @@ public class SearchService {
         List<Integer> pageIds = rankIds.subList(start, end);
 
         // 根据docIds查询documents
-        List<Document> documents = this.findDocsByIds(pageIds);
+        List<Document> documents = this.findDocsByIds(pageIds, keywords);
 
         //将查询到的documents封装进searchResult
         SearchResult searchResult = new SearchResult();
