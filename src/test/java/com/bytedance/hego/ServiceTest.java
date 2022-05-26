@@ -54,7 +54,7 @@ public class ServiceTest {
     @Test
     void testTokenizeQuery() {
         String query = "当然从医院患者人满为患的情况看,也同样缺少医生";
-        List<String> keywords = searchService.tokenizeQuery(query);
+        List<String> keywords = searchService.queryToKeywords(query);
         System.out.println(keywords);
     }
 
@@ -119,7 +119,11 @@ public class ServiceTest {
         }
         System.out.println(keywords);
 
+    }
 
+    @Test
+    void testImageToKeywords() {
+        // searchService.imageToQuery();
     }
 
 }

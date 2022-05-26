@@ -1,14 +1,17 @@
 package com.bytedance.hego.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.bytedance.hego.entity.Document;
 import com.bytedance.hego.entity.Page;
 import com.bytedance.hego.entity.SearchResult;
-import com.bytedance.hego.util.HegoUtil;
-import com.bytedance.hego.util.LevelDBUtil;
+import com.bytedance.hego.util.*;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.net.URLEncoder;
 import java.util.*;
 
 @Service
@@ -20,19 +23,53 @@ public class SearchService {
     @Resource
     private HegoUtil hegoUtil;
 
+    @Resource
+    private AuthService authService;
+
 
     /**
      * 将用户输入的query清洗并分词得到keywords
      * @param query
      * @return keywords list
      */
-    public List<String> tokenizeQuery(String query) {
+    public List<String> queryToKeywords(String query) {
         // 去除中文以外字符
         String sentences = query.replaceAll("[^\u4E00-\u9FA5]", "");
         // 分词
         JiebaSegmenter segmenter = new JiebaSegmenter();
         List<String> keywords = hegoUtil.tokenize(sentences);
         return keywords;
+    }
+
+    public String imageToQuery(MultipartFile file) {
+
+        // 请求url: 调用百度通用物体识别api识别图片
+        String url = "https://aip.baidubce.com/rest/2.0/image-classify/v2/advanced_general";
+        StringBuilder description = new StringBuilder();
+        try {
+            byte[] imgData = file.getBytes();
+            String imgStr = Base64Util.encode(imgData);
+            String imgParam = URLEncoder.encode(imgStr, "UTF-8");
+            String param = "image=" + imgParam;
+
+            // 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
+            String accessToken = authService.getAuth();
+            String jsonResult = HttpUtil.post(url, accessToken, param);
+            // {"result_num":5,"result":[{"keyword":"人物特写","score":0.776894,"root":"人物-人物特写"}
+            // 从JSON中提取keyword并串联成文字描述query
+            Map<String, String> tmp = JSON.parseObject(jsonResult, new TypeReference<Map<String, String>>() {});
+            String tmpResult = tmp.get("result");
+            List<Map<String, String>> results = JSON.parseObject(tmpResult, new TypeReference<List<Map<String, String>>>() {});
+            for (Map<String, String> result: results) {
+                description.append(result.get("keyword"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String query = description.toString();
+        return query;
+
     }
 
     /**
@@ -114,13 +151,13 @@ public class SearchService {
     public SearchResult findDocsByQuery(String query, String filter, int current) {
 
         // 将query清洗分词得到keywords
-        List<String> keywords = this.tokenizeQuery(query);
+        List<String> keywords = this.queryToKeywords(query);
         // 找到keywords对应的docIds并合并
         Map<Integer, Float> ids = this.findIdsByKeywords(keywords);
 
         // 关键词过滤: 将filter中的keyword对应的docIds从docIds结果集中删除
         if (!filter.equals("")) {
-            List<String> filterKeywords = this.tokenizeQuery(filter);
+            List<String> filterKeywords = this.queryToKeywords(filter);
             Map<Integer, Float> filterIds = this.findIdsByKeywords(filterKeywords);
             Iterator iterator = ids.keySet().iterator();
             while (iterator.hasNext()) {
@@ -153,4 +190,6 @@ public class SearchService {
 
         return searchResult;
     }
+
+
 }
