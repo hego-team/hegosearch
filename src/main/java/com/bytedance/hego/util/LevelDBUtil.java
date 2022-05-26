@@ -27,7 +27,6 @@ import java.util.Map;
 @Slf4j
 public class LevelDBUtil {
 
-    private DB db;
     private DB docStorages;
     private DB invertedIndexStorages;
     private DB positiveIndexStorages;
@@ -71,9 +70,9 @@ public class LevelDBUtil {
      * @param key 键
      * @param val 值
      */
-    public void put(String key, Object val) {
+    private void put(String key, Object val, DB db) {
         try {
-            this.db.put(key.getBytes(CHARSET), this.serializer(val));
+            db.put(key.getBytes(CHARSET), this.serializer(val));
         } catch (UnsupportedEncodingException e) {
             log.error("编码转化异常", e);
         }
@@ -125,7 +124,7 @@ public class LevelDBUtil {
      * 根据key删除数据
      * @param key 键
      */
-    public void delete(String key) {
+    private void delete(String key, DB db) {
         try {
             db.delete(key.getBytes(CHARSET));
         } catch (Exception e) {
@@ -138,7 +137,7 @@ public class LevelDBUtil {
      * 获取所有key
      * @return 所有的keys
      */
-    public List<String> getKeys() {
+    private List<String> getKeys(DB db) {
 
         List<String> list = new ArrayList<>();
         DBIterator iterator = null;
@@ -166,7 +165,13 @@ public class LevelDBUtil {
 
     //spring销毁对象前关闭
     @PreDestroy
-    public void closeDB() {
+    public void closeAllDB() {
+        this.closeDB(this.docStorages);
+        this.closeDB(this.invertedIndexStorages);
+        this.closeDB(this.positiveIndexStorages);
+    }
+
+    private void closeDB(DB db) {
         if (db != null) {
             try {
                 db.close();

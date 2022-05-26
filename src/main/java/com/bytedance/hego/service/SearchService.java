@@ -83,13 +83,26 @@ public class SearchService {
      * @param ids
      * @return documents list
      */
-    public List<Document> findDocsByIds(List<Integer> ids) {
+    public List<Document> findDocsByIds(List<Integer> ids, List<String> keywords) {
         List<Document> docs = new ArrayList<>();
         for (Integer id: ids) {
             Document doc = levelDBUtil.getDoc(Integer.toString(id));
+
+            // 处理关键词高亮
+            String text = doc.getContent();
+            StringBuilder tmp = new StringBuilder(text);
+            for (String keyword: keywords) {
+                if (tmp.indexOf(keyword) != -1) {
+                    hegoUtil.replaceAll(tmp, keyword, "<em>" + keyword + "</em>");
+                }
+            }
+            String hightlightText = tmp.toString();
+
+            doc.setContent(hightlightText);
             doc.setDocId(id);
             docs.add(doc);
         }
+
         return docs;
     }
 
@@ -98,15 +111,28 @@ public class SearchService {
      * @param query
      * @return
      */
-    public SearchResult findDocsByQuery(String query, int current) {
+    public SearchResult findDocsByQuery(String query, String filter, int current) {
 
         // 将query清洗分词得到keywords
         List<String> keywords = this.tokenizeQuery(query);
         // 找到keywords对应的docIds并合并
         Map<Integer, Float> ids = this.findIdsByKeywords(keywords);
+
+        // 关键词过滤: 将filter中的keyword对应的docIds从docIds结果集中删除
+        if (!filter.equals("")) {
+            List<String> filterKeywords = this.tokenizeQuery(filter);
+            Map<Integer, Float> filterIds = this.findIdsByKeywords(filterKeywords);
+            Iterator iterator = ids.keySet().iterator();
+            while (iterator.hasNext()) {
+                Integer keyword = (Integer) iterator.next();
+                if (filterIds.containsKey(keyword)) {
+                    iterator.remove();
+                }
+            }
+        }
+
         // 将docIds按score排序
         List<Integer> rankIds = this.rankIdsByScore(ids);
-
         // 提取当前页的docIds
         Page page = new Page();
         page.setCurrent(current);
@@ -117,7 +143,7 @@ public class SearchService {
         List<Integer> pageIds = rankIds.subList(start, end);
 
         // 根据docIds查询documents
-        List<Document> documents = this.findDocsByIds(pageIds);
+        List<Document> documents = this.findDocsByIds(pageIds, keywords);
 
         //将查询到的documents封装进searchResult
         SearchResult searchResult = new SearchResult();

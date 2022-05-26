@@ -58,7 +58,7 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 ```
 {
-	"0": ["预计", "四季", "季度", "四季度", ...],
+    "0": ["预计", "四季", "季度", "四季度", ...],
 	"1": ["医院", "患者", "人满为患", "情况", ...],
 	...
 }
@@ -68,8 +68,10 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 ### 已完成
 
-1. 搜索文本/图片信息，并将搜索结果分页，每页最多10条结果
-    
+1. 搜索文本/图片信息
+2. 搜索结果分页，每页最多10条结果
+3. 关键词高亮
+
     接口示例：GET /hego/result?query=医院患者&page=10
     
     ```
@@ -79,12 +81,12 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
         "documents": [   // 查询结果
           {
             "docId":99374,
-            "content":"西京医院脊柱外科专家团队为患者进行手术."
+            "content":"西京<em>医院</em>脊柱外科专家团队为<em>患者</em>进行手术."，
             "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Ftranslate%2F386%2Fw729h457%2F20180712%2F-e3y-hfefkqr1069131.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630786327&t=95892981d9a434b2106fa3c07f55212d"
           },
           {
             "docId": 68063,
-            "content": "[转载]颈椎病患者全身运动-青岛洪强骨科医院",
+            "content": "[转载]颈椎病<em>患者</em>全身运动-青岛洪强骨科<em>医院</em>",
             "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fs8.sinaimg.cn%2Fmiddle%2F78eb8059hbbf4ac2408a0%26690&refer=http%3A%2F%2Fs8.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630659895&t=186f73a556e74867dcf7874e3891521f"
           },
           ...
@@ -93,10 +95,32 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
           {"current":10,"limit":10,"rows":2134,"start":90,"end":100,"total":214,"from":5,"to":15}
     }
     ```
-        
+3. 关键词过滤
+
+    接口示例：GET /hego/result?query=医院患者&filter=医院&page=10
+     ```
+        {
+            "time": 28.0        // 响应时间ms
+            "total": 514        // 查询结果总数
+            "documents": [...]  // 查询结果
+            "page": {...}       // 分页信息
+              
+        }
+        ```     
 
 ### 待完成
 
-1. 关键词高亮
-2. 支持模糊查询
-3. 查询速度优化
+1. 关键词高亮(option)
+2. 相关搜索功能
+3. 支持模糊查询(option)
+4. 搜索提示词功能(option)
+5. 以图搜图功能
+6. 查询速度优化
+7. 关联度算法优化
+
+## 用户模块
+### 待完成
+1. 用户注册、登录、注销功能
+2. 用户收藏夹功能
+3. 用户搜索历史记录(option)
+
