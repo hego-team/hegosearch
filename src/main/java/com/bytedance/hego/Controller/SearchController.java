@@ -35,9 +35,14 @@ public class SearchController {
     @RequestMapping(value="/image", method=RequestMethod.POST)
     public SearchResult getSearchResult(@RequestParam("file") MultipartFile file,
                                   @RequestParam(value = "page") int current) {
+        long start = System.currentTimeMillis();
 
         String query = searchService.imageToQuery(file);
+        System.out.println(query);
         SearchResult searchResult = searchService.findDocsByQuery(query, "", current);
+
+        long end = System.currentTimeMillis();
+        searchResult.setTime(end - start);
         return searchResult;
     }
 }
