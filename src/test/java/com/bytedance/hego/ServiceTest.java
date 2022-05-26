@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SpringBootTest
 public class ServiceTest {
@@ -96,8 +93,29 @@ public class ServiceTest {
     @Test
     void testFindDocsByQuery() {
         String query = "医院患者";
-        SearchResult searchResult = searchService.findDocsByQuery(query, 2);
+        SearchResult searchResult = searchService.findDocsByQuery(query, "", 2);
         System.out.println(searchResult);
+
+        Map<Integer, Double> keywords = new HashMap<>();
+        keywords.put(1, 0.1);
+        keywords.put(2, 0.2);
+        keywords.put(3, 0.3);
+        keywords.put(4, 0.4);
+
+        Map<Integer, Double> filterKeywords = new HashMap<>();
+        filterKeywords.put(2, 0.2);
+        filterKeywords.put(3, 0.3);
+
+        Iterator iterator = keywords.keySet().iterator();
+        while (iterator.hasNext()) {
+            Integer keyword = (Integer) iterator.next();
+            if (filterKeywords.containsKey(keyword)) {
+                iterator.remove();
+            }
+        }
+        System.out.println(keywords);
+
+
     }
 
 }

@@ -98,15 +98,28 @@ public class SearchService {
      * @param query
      * @return
      */
-    public SearchResult findDocsByQuery(String query, int current) {
+    public SearchResult findDocsByQuery(String query, String filter, int current) {
 
         // 将query清洗分词得到keywords
         List<String> keywords = this.tokenizeQuery(query);
         // 找到keywords对应的docIds并合并
         Map<Integer, Float> ids = this.findIdsByKeywords(keywords);
+
+        // 关键词过滤: 将filter中的keyword对应的docIds从docIds结果集中删除
+        if (!filter.equals("")) {
+            List<String> filterKeywords = this.tokenizeQuery(filter);
+            Map<Integer, Float> filterIds = this.findIdsByKeywords(filterKeywords);
+            Iterator iterator = ids.keySet().iterator();
+            while (iterator.hasNext()) {
+                Integer keyword = (Integer) iterator.next();
+                if (filterIds.containsKey(keyword)) {
+                    iterator.remove();
+                }
+            }
+        }
+
         // 将docIds按score排序
         List<Integer> rankIds = this.rankIdsByScore(ids);
-
         // 提取当前页的docIds
         Page page = new Page();
         page.setCurrent(current);

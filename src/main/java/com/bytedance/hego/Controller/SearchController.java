@@ -14,10 +14,14 @@ public class SearchController {
 
     @RequestMapping(value="/result",method= RequestMethod.GET)
     public SearchResult getSearchResult(@RequestParam("query") String query,
-                                        @RequestParam(value = "page", required = false) int current) {
+                                        @RequestParam(value = "filter", required = false) String filter,
+                                        @RequestParam(value = "page") int current) {
+        if (filter == null) {
+            filter = "";
+        }
 
         long start = System.currentTimeMillis();
-        SearchResult searchResult = searchService.findDocsByQuery(query, current);
+        SearchResult searchResult = searchService.findDocsByQuery(query, filter, current);
         // 记录查询用时
         long end = System.currentTimeMillis();
         searchResult.setTime(end - start);
