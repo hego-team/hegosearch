@@ -39,7 +39,7 @@ public class HegoUtil {
     }
 
     // replaceAll method for StringBuilder
-    public static void replaceAll(StringBuilder sb, String find, String replace){
+    public void replaceAll(StringBuilder sb, String find, String replace){
 
         //compile pattern from find string
         Pattern p = Pattern.compile(find);

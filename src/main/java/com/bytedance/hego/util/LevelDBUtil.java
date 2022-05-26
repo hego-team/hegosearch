@@ -109,15 +109,21 @@ public class LevelDBUtil {
         String value = null;
         try {
             byte[] keyByte = key.getBytes(CHARSET);
-            value = new String(this.invertedIndexStorages.get(keyByte), CHARSET);
+            if (this.invertedIndexStorages.get(keyByte) != null) {
+                value = new String(this.invertedIndexStorages.get(keyByte), CHARSET);
+            } else {
+                value = "";
+            }
+
+            System.out.println(value);
         } catch (Exception e) {
-            log.error("levelDB get error", e);
+            log.error("levelDB get error or the keyword does not exist", e);
         }
 
-        if(value != null)
+        if(!value.equals(""))
             return JSON.parseObject(value, new TypeReference<HashMap<Integer, Float>>() {});
         else
-            return null;
+            return new HashMap<Integer, Float>();
     }
 
     /**

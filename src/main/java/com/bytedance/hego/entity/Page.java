@@ -13,18 +13,18 @@ public class Page {
     // 每页显示数据个数上限
     private int limit = 10;
     // 数据总数(用于计算总页数)
-    private int rows;
+    private int rows = 0;
 
     // 当前页的第一条数据的index
-    private int start;
+    private int start = 0;
     // 当前页的最后一条数据的index
-    private int end;
+    private int end = 0;
     // 总页数
-    private int total;
+    private int total = 1;
     // 起始页码
-    private int from;
+    private int from = 1;
     // 结束页码
-    private int to;
+    private int to = 1;
 
 
     /**
@@ -34,7 +34,7 @@ public class Page {
      */
     public int getStart() {
         // current * limit - limit
-        return (current - 1) * limit;
+        return Math.max(0, (current - 1) * limit);
     }
 
     /**

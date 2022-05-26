@@ -67,6 +67,12 @@ public class SearchService {
             e.printStackTrace();
         }
 
+        // 删除一些无用且影响搜索结果的词
+        hegoUtil.replaceAll(description, "截图", "");
+        hegoUtil.replaceAll(description, "屏幕", "");
+        hegoUtil.replaceAll(description, "矢量图", "");
+        hegoUtil.replaceAll(description, "人物", "");
+
         String query = description.toString();
         return query;
 
@@ -152,8 +158,9 @@ public class SearchService {
 
         // 将query清洗分词得到keywords
         List<String> keywords = this.queryToKeywords(query);
-        // 找到keywords对应的docIds并合并
-        Map<Integer, Float> ids = this.findIdsByKeywords(keywords);
+
+        // 找到keywords对应的docIds并合并，docIds为空直接return
+        Map<Integer, Float> ids = findIdsByKeywords(keywords);
 
         // 关键词过滤: 将filter中的keyword对应的docIds从docIds结果集中删除
         if (!filter.equals("")) {
@@ -172,8 +179,8 @@ public class SearchService {
         List<Integer> rankIds = this.rankIdsByScore(ids);
         // 提取当前页的docIds
         Page page = new Page();
-        page.setCurrent(current);
         page.setRows(rankIds.size());
+        page.setCurrent(Math.min(current, page.getTotal()));
         // 当前页的起止document
         int start = page.getStart();
         int end = page.getEnd();
