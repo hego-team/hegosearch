@@ -23,9 +23,11 @@ search engine ，java implemention
     ```
     cd script
     pip install -r requirements.txt
-    python init_index.py
     ```
-
+4. 把数据集(wukong_100m_62.csv)放到script目录下然后运行脚本
+    ```
+   python init_index.py
+    ```
 #### 运行结果
 运行脚本后在data目录下生成doc, invertedIndex, positiveIndex
 
