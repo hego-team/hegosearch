@@ -100,6 +100,7 @@ def compute_score(inverted_index, positive_index):
 
 
 def save_index(data, dbname):
+    # 根据操作系统修改成合适的路径格式
     db = leveldb.LevelDB('../data/' + dbname)
     batch = leveldb.WriteBatch()
     for k, v in data.items():
@@ -112,6 +113,7 @@ def save_index(data, dbname):
 
 
 def save_doc(words, images):
+    # 根据操作系统修改成合适的路径格式
     db = leveldb.LevelDB('../data/doc')
     batch = leveldb.WriteBatch()
     for i in range(len(words)):

@@ -10,14 +10,23 @@ search engine ，java implemention
 
 ## 数据处理模块
 
-如果leveldb安装失败可以试试: [https://github.com/happynear/py-leveldb-windows](https://github.com/happynear/py-leveldb-windows)
+#### 运行步骤
+1. 安装python3.6
+2. 根据操作系统修改init_index.py里的路径名
+    ```
+    db = leveldb.LevelDB('../data/doc')
+    db = leveldb.LevelDB('../data/' + dbname)
+    ```
+3. 安装依赖
+    如果leveldb安装失败可以试试: [https://github.com/happynear/py-leveldb-windows](https://github.com/happynear/py-leveldb-windows)
+    
+    ```
+    cd script
+    pip install -r requirements.txt
+    python init_index.py
+    ```
 
-```
-cd script
-pip install -r requirements.txt
-python init_index.py
-```
-
+#### 运行结果
 运行脚本后在data目录下生成doc, invertedIndex, positiveIndex
 
 doc: 保存csv中所有信息
@@ -25,14 +34,14 @@ doc: 保存csv中所有信息
 ```
 {
     "0": [
-	    "content": "预计四季度或明年的出口增速可能转负,但整体仍保持着比较高的规模."
-	    "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fnimg.ws.126.net%2F%3Furl%3Dhttp%253A%252F%252Fdingyue.ws.126.net%252F2021%252F0819%252F14f73805j00qy27bs000xc000hs009hg.jpg%26thumbnail%3D650x2147483647%26quality%3D80%26type%3Djpg&refer=http%3A%2F%2Fnimg.ws.126.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1632609419&t=fb64f531652a851f8c25a1c1eabc141b"
+        "content": "预计四季度或明年的出口增速可能转负,但整体仍保持着比较高的规模."
+        "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fnimg.ws.126.net%2F%3Furl%3Dhttp%253A%252F%252Fdingyue.ws.126.net%252F2021%252F0819%252F14f73805j00qy27bs000xc000hs009hg.jpg%26thumbnail%3D650x2147483647%26quality%3D80%26type%3Djpg&refer=http%3A%2F%2Fnimg.ws.126.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1632609419&t=fb64f531652a851f8c25a1c1eabc141b"
     ],
     "1": [
-	    "content": "当然从医院患者人满为患的情况看,也同样缺少医生"
-	    "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx4.sinaimg.cn%2Fcrop.0.11.1786.993%2F0033ImPzly1gkp0ee8jbrj61dm0rwu0x02.jpg&refer=http%3A%2F%2Fwx4.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630658390&t=29c486e6298b9fcb52df8088e676fd87"
-	],
-''''''
+        "content": "当然从医院患者人满为患的情况看,也同样缺少医生"
+        "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx4.sinaimg.cn%2Fcrop.0.11.1786.993%2F0033ImPzly1gkp0ee8jbrj61dm0rwu0x02.jpg&refer=http%3A%2F%2Fwx4.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630658390&t=29c486e6298b9fcb52df8088e676fd87"
+    ],
+    ...
 }
 ```
 
@@ -59,7 +68,7 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 ```
 {
     "0": ["预计", "四季", "季度", "四季度", ...],
-	"1": ["医院", "患者", "人满为患", "情况", ...],
+    "1": ["医院", "患者", "人满为患", "情况", ...],
 	...
 }
 ```
@@ -146,7 +155,7 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 参考ES的功能
 https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
-1. 搜索提示词功能：例如用户输入字节可以提示字节跳动，用所有搜索次数大于某个阈值的字符串构建前缀树实现
+1. 搜索提示词功能：例如用户输入字节可以提示字节跳动，用所有词频大于某个阈值的关键词构建前缀树实现
     https://developer.aliyun.com/article/765914
 2. 提示器\拼写检查功能：向搜索体验中加入 did-you-mean（您指的是 XXX 吗）功能，让用户能够选择改正后的整个短语。例如用户输入学的校可以搜到学校的结果。
 3. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，可以调百度翻译API
