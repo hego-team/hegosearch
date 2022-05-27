@@ -142,15 +142,18 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 ### 优化
 
-搜索功能优化
+#### 搜索功能优化
+
+参考ES的功能
+https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
 1. 搜索提示词功能：例如用户输入字节可以提示字节跳动，用所有搜索次数大于某个阈值的字符串构建前缀树实现
     https://developer.aliyun.com/article/765914
-2. 容错查询：允许用户输入字词错误，例如输入学的校可以搜到学校的结果
-3. 必须包含关键词功能：query中双引号内的关键词必须出现在搜索结果中，与关键词过滤实现类似
-4. 支持跨语言搜索：输入query不是中文时，将query翻译成中文查询，可以调百度翻译API
+2. 提示器\拼写检查功能：向搜索体验中加入 did-you-mean（您指的是 XXX 吗）功能，让用户能够选择改正后的整个短语。例如用户输入学的校可以搜到学校的结果。
+3. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，可以调百度翻译API
     https://fanyi-api.baidu.com/api/trans/product/apidoc#appendix
+4. 同义词搜索功能
 
-搜索性能优化
+#### 搜索性能优化
 1. 查询速度提升 
     1. redis缓存doc
     2. 多线程搜索
