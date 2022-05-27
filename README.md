@@ -23,9 +23,15 @@ search engine ，java implemention
     ```
     cd script
     pip install -r requirements.txt
-    python init_index.py
     ```
+4. 把数据集放到script目录下然后运行脚本
+    
+    数据集：https://pan.baidu.com/s/1nxGKhtbX--QRl0wCCGe7Ng 
+        提取码：7mi1 
 
+    ```
+   python init_index.py
+    ```
 #### 运行结果
 运行脚本后在data目录下生成doc, invertedIndex, positiveIndex
 
