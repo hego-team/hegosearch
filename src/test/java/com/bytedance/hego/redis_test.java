@@ -23,7 +23,7 @@ public class redis_test {
         result1.setTime(90);
         result1.setTotal(1000);
         redisServiceUtil.set(testKey,result1 );
-        Object result = redisServiceUtil.get(testKey_2);
+        Object result = redisServiceUtil.get(testKey);
         System.out.println("获取redis测试数据：" + result);
     }
 }

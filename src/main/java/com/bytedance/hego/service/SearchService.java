@@ -6,8 +6,6 @@ import com.bytedance.hego.entity.Document;
 import com.bytedance.hego.entity.Page;
 import com.bytedance.hego.entity.SearchResult;
 import com.bytedance.hego.util.*;
-import com.huaban.analysis.jieba.JiebaSegmenter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,22 +25,20 @@ public class SearchService {
     @Resource
     private AuthService authService;
 
-    @Autowired
+    @Resource
     private RedisServiceUtil redisServiceUtil;
 
 
     /**
      * 将用户输入的query清洗并分词得到keywords
-     * @param query
+     * @param query 用户输入的查询内容
      * @return keywords list
      */
     public List<String> queryToKeywords(String query) {
         // 去除中文以外字符
         String sentences = query.replaceAll("[^\u4E00-\u9FA5]", "");
         // 分词
-        JiebaSegmenter segmenter = new JiebaSegmenter();
-        List<String> keywords = hegoUtil.tokenize(sentences);
-        return keywords;
+        return hegoUtil.tokenize(sentences);
     }
 
     public String imageToQuery(MultipartFile file) {
@@ -77,14 +73,13 @@ public class SearchService {
         hegoUtil.replaceAll(description, "矢量图", "");
         hegoUtil.replaceAll(description, "人物", "");
 
-        String query = description.toString();
-        return query;
+        return description.toString();
 
     }
 
     /**
      * 从倒排索引中提取keywords的docIds并合并
-     * @param keywords
+     * @param keywords query分词得到的keywords
      * @return merge_docIds
      */
     public Map<Integer, Float> findIdsByKeywords(List<String> keywords) {
@@ -104,19 +99,14 @@ public class SearchService {
 
     /**
      * 将docId按score排序
-     * @param ids
+     * @param ids 根据keywords查询到的所有docId
      * @return rank_ids
      */
     public List<Integer> rankIdsByScore(Map<Integer, Float> ids) {
         List<Integer> rankIds = new ArrayList<>();
 
-        List<Map.Entry<Integer, Float>> tmp = new ArrayList<Map.Entry<Integer, Float>>(ids.entrySet());
-        tmp.sort(new Comparator<Map.Entry<Integer, Float>>() {
-            @Override
-            public int compare(Map.Entry<Integer, Float> o1, Map.Entry<Integer, Float> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
+        List<Map.Entry<Integer, Float>> tmp = new ArrayList<>(ids.entrySet());
+        tmp.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
 
         for (Map.Entry<Integer, Float> entry : tmp) {
             Integer id = entry.getKey();
@@ -127,7 +117,7 @@ public class SearchService {
 
     /**
      * 查询docIds对应的documents
-     * @param ids
+     * @param ids 排序后的docIds
      * @return documents list
      */
     public List<Document> findDocsByIds(List<Integer> ids, List<String> keywords) {
@@ -154,11 +144,19 @@ public class SearchService {
     }
 
     /**
-     * 根据query与page查询document
-     * @param query
-     * @return
+     * 根据query查询document
+     * @param query 用户输入的查询内容
+     * @return searchResult 查询结果
      */
     public SearchResult findDocsByQuery(String query, String filter, int current) {
+
+        // 从缓存中取数据query::filter::current
+        String redisKey = RedisKeyUtil.getResultKey(query, filter, current);
+        SearchResult cacheResult = getCache(redisKey);
+        if (cacheResult != null) {
+            return cacheResult;
+        }
+
 
         // 将query清洗分词得到keywords
         List<String> keywords = this.queryToKeywords(query);
@@ -198,8 +196,20 @@ public class SearchService {
         searchResult.setDocuments(documents);
         searchResult.setTotal(ids.size());
         searchResult.setPage(page);
+
+        // 将searchResult放入缓存
+        initCache(redisKey, searchResult);
+
         return searchResult;
     }
 
+    // 优先从缓存中取值
+    private SearchResult getCache(String redisKey) {
+        return (SearchResult) redisServiceUtil.get(redisKey);
+    }
 
+    // 缓存中取不到时初始化缓存数据
+    private void initCache(String redisKey, SearchResult searchResult) {
+        redisServiceUtil.set(redisKey, searchResult);
+    }
 }
