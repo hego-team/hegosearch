@@ -7,6 +7,7 @@ import com.bytedance.hego.entity.Page;
 import com.bytedance.hego.entity.SearchResult;
 import com.bytedance.hego.util.*;
 import com.huaban.analysis.jieba.JiebaSegmenter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,9 @@ public class SearchService {
 
     @Resource
     private AuthService authService;
+
+    @Autowired
+    private RedisServiceUtil redisServiceUtil;
 
 
     /**
@@ -194,7 +198,6 @@ public class SearchService {
         searchResult.setDocuments(documents);
         searchResult.setTotal(ids.size());
         searchResult.setPage(page);
-
         return searchResult;
     }
 

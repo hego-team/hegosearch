@@ -2,6 +2,7 @@ package com.bytedance.hego.Controller;
 
 import com.bytedance.hego.entity.SearchResult;
 import com.bytedance.hego.service.SearchService;
+import com.bytedance.hego.util.RedisServiceUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,9 @@ public class SearchController {
     @Resource
     private SearchService searchService;
 
+    @Resource
+    private RedisServiceUtil redisServiceUtil;
+
     // 文字搜索接口
     @RequestMapping(value="/text", method=RequestMethod.GET)
     public SearchResult getSearchResult(@RequestParam("query") String query,
@@ -24,11 +28,17 @@ public class SearchController {
         }
 
         long start = System.currentTimeMillis();
-        SearchResult searchResult = searchService.findDocsByQuery(query, filter, current);
-        // 记录查询用时
-        long end = System.currentTimeMillis();
-        searchResult.setTime(end - start);
-        return searchResult;
+        Object result = redisServiceUtil.get(query);
+        if(result != null){
+            return (SearchResult)result;
+        }else {
+            SearchResult searchResult = searchService.findDocsByQuery(query, filter, current);
+            // 记录查询用时
+            long end = System.currentTimeMillis();
+            searchResult.setTime(end - start);
+            redisServiceUtil.set(query,searchResult);
+            return searchResult;
+        }
     }
 
     // 图片搜索接口
