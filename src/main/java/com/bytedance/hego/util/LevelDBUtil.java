@@ -38,7 +38,7 @@ public class LevelDBUtil {
 
     //spring启动时初始化
     @PostConstruct
-    public void initLevelDB() throws UnsupportedEncodingException {
+    public void initLevelDB(){
         this.docStorages = newStorage("doc");
         this.invertedIndexStorages = newStorage("invertedIndex");
         this.positiveIndexStorages = newStorage("positiveIndex");
@@ -53,6 +53,7 @@ public class LevelDBUtil {
         options.logger(System.out::println);  // 打印日志
         DB db = null;
         try {
+
             db = factory.open(new File(DB_DIR_PATH + dbName), options);
         } catch (IOException e) {
             log.error("levelDB启动异常", e);
@@ -115,7 +116,6 @@ public class LevelDBUtil {
                 value = "";
             }
 
-            System.out.println(value);
         } catch (Exception e) {
             log.error("levelDB get error or the keyword does not exist", e);
         }
