@@ -198,5 +198,19 @@ public class SearchService {
         return searchResult;
     }
 
+    /**
+     * 根据query查询提示词
+     * @param query
+     * @return
+     */
+    public SearchResult findPromptByQuery(String query) {
+        SearchResult searchResult = new SearchResult();
+        if (hegoUtil.startsWith(query)) {
+            List<Document> PromptStr=hegoUtil.PromptString(query);
+            searchResult.setDocuments(PromptStr);
+        }
+        return  searchResult;
+
+    }
 
 }

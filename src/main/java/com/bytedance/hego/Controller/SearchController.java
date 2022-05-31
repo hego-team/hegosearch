@@ -45,4 +45,15 @@ public class SearchController {
         searchResult.setTime(end - start);
         return searchResult;
     }
+
+    @RequestMapping(value="/prompt", method=RequestMethod.GET)
+    public SearchResult getSearchResult(@RequestParam("query") String query)
+    {
+        long start = System.currentTimeMillis();
+        SearchResult searchResult = searchService.findPromptByQuery(query);
+        // 记录查询前缀树用时
+        long end = System.currentTimeMillis();
+        searchResult.setTime(end - start);
+        return searchResult;
+    }
 }
