@@ -23,7 +23,7 @@ public class HegoUtil {
 //    private ZhWordCheckers checkService;
 
     // Merge Hashmap
-    public static Map<Integer,Float> addTo(Map<Integer,Float> target, Map<Integer,Float> plus) {
+    public Map<Integer,Float> addTo(Map<Integer,Float> target, Map<Integer,Float> plus) {
         for (Integer key : plus.keySet()) {
             if (target.containsKey(key)) {
                 target.put(key, target.get(key) + plus.get(key));

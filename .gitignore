@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Others ###
+data/doc
+data/invertedIndex
+data/positiveIndex
+script/*.csv

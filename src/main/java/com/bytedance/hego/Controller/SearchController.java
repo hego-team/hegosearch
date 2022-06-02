@@ -14,6 +14,7 @@ public class SearchController {
     @Resource
     private SearchService searchService;
 
+
     // 文字搜索接口
     @RequestMapping(value="/text", method=RequestMethod.GET)
     public SearchResult getSearchResult(@RequestParam("query") String query,
@@ -34,12 +35,16 @@ public class SearchController {
     // 图片搜索接口
     @RequestMapping(value="/image", method=RequestMethod.POST)
     public SearchResult getSearchResult(@RequestParam("file") MultipartFile file,
-                                  @RequestParam(value = "page") int current) {
+                                        @RequestParam(value = "filter", required = false) String filter,
+                                        @RequestParam(value = "page") int current) {
         long start = System.currentTimeMillis();
 
+        if (filter == null) {
+            filter = "";
+        }
+
         String query = searchService.imageToQuery(file);
-        System.out.println(query);
-        SearchResult searchResult = searchService.findDocsByQuery(query, "", current);
+        SearchResult searchResult = searchService.findDocsByQuery(query, filter, current);
 
         long end = System.currentTimeMillis();
         searchResult.setTime(end - start);
