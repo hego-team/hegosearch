@@ -46,6 +46,7 @@ public class SearchController {
         return searchResult;
     }
 
+    //提示词搜索接口
     @RequestMapping(value="/prompt", method=RequestMethod.GET)
     public SearchResult getSearchResult(@RequestParam("query") String query)
     {
@@ -56,4 +57,31 @@ public class SearchController {
         searchResult.setTime(end - start);
         return searchResult;
     }
+
+    //拼写检查功能
+    @RequestMapping(value="/check", method=RequestMethod.GET)
+    public SearchResult getSearchResult(@RequestParam("query") String query,
+                                        @RequestParam(value="check") int check)
+    {
+        long start = System.currentTimeMillis();
+        SearchResult searchResult = searchService.CheckByQuery(query);
+        // 记录拼写检测用时
+        long end = System.currentTimeMillis();
+        searchResult.setTime(end - start);
+        return searchResult;
+    }
+
+    //英文翻译功能
+    @RequestMapping(value="/trans", method=RequestMethod.GET)
+    public SearchResult getSearchResult(@RequestParam("query") String query,
+                                        @RequestParam(value="trans") String trans)
+    {
+        long start = System.currentTimeMillis();
+        SearchResult searchResult = searchService.TransByQuery(query);
+        // 记录翻译用时
+        long end = System.currentTimeMillis();
+        searchResult.setTime(end - start);
+        return searchResult;
+    }
+
 }

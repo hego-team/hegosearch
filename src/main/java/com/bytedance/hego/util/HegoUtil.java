@@ -18,7 +18,9 @@ public class HegoUtil {
 
     private JiebaSegmenter segmenter;
 //    public ArrayList<String> records;
-    public Trie TrieTree;
+    private Trie TrieTree;
+
+//    private ZhWordCheckers checkService;
 
     // Merge Hashmap
     public static Map<Integer,Float> addTo(Map<Integer,Float> target, Map<Integer,Float> plus) {

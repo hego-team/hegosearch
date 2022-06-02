@@ -1,5 +1,7 @@
 package com.bytedance.hego.service;
 
+import com.bytedance.hego.service.Impl.BtService;
+import com.bytedance.hego.util.ZhWordCheckers;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.bytedance.hego.entity.Document;
@@ -26,6 +28,8 @@ public class SearchService {
     @Resource
     private AuthService authService;
 
+    @Resource
+    private BtService btService;
 
     /**
      * 将用户输入的query清洗并分词得到keywords
@@ -213,4 +217,35 @@ public class SearchService {
 
     }
 
+    /**
+     * 根据query纠正结果
+     * @param query
+     * @return
+     */
+    public SearchResult CheckByQuery(String query) {
+
+        List<String> tempres=ZhWordCheckers.correctList(query,10);
+
+        List<Document> CheckDoc=new ArrayList<>();
+        SearchResult searchResult = new SearchResult();
+        for(String str:tempres)
+        {
+            Document tempDoc=new Document();
+            tempDoc.setContent(str);
+            CheckDoc.add(tempDoc);
+        }
+        searchResult.setDocuments(CheckDoc);
+        return  searchResult;
+    }
+
+    public SearchResult TransByQuery(String query) {
+        String str= btService.translate(query);
+        List<Document> CheckDoc=new ArrayList<>();
+        SearchResult searchResult = new SearchResult();
+        Document tempDoc=new Document();
+        tempDoc.setContent(str);
+        CheckDoc.add(tempDoc);
+        searchResult.setDocuments(CheckDoc);
+        return  searchResult;
+    }
 }
