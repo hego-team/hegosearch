@@ -161,12 +161,21 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 参考ES的功能
 https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
-1. 搜索提示词功能：例如用户输入字节可以提示字节跳动，用所有词频大于某个阈值的关键词构建前缀树实现
-    https://developer.aliyun.com/article/765914
-2. 提示器\拼写检查功能：向搜索体验中加入 did-you-mean（您指的是 XXX 吗）功能，让用户能够选择改正后的整个短语。例如用户输入学的校可以搜到学校的结果。
-3. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，可以调百度翻译API
+1. 搜索提示词功能：
+ 
+    将数据集中词频大于5的关键词构建前缀树，接口示例：http://localhost:8443/hego/search/prompt?query=中国
+2. 提示器\拼写检查功能：
+
+     基于困惑集实现常见错误的纠错功能，困惑集存储在src\main\resources\data\word_checker_zh.txt下
+     
+     接口实例：http://localhost:8443/hego/search/check?query=万变不离其中&check=0
+3. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，调百度翻译API
     https://fanyi-api.baidu.com/api/trans/product/apidoc#appendix
+    
+    接口实例：http://localhost:8443/hego/search/trans?query=school&trans=2
 4. 同义词搜索功能
+
+    暂时未找到对应的同义词词库，找到了一个开源的python同义词转换工具：https://github.com/chatopera/Synonyms
 
 #### 搜索性能优化
 1. 查询速度提升 
