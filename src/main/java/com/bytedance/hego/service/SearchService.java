@@ -28,8 +28,6 @@ public class SearchService {
     private AuthService authService;
 
     @Resource
-    private BtService btService;
-    @Resource
     private RedisServiceUtil redisServiceUtil;
 
 
@@ -154,9 +152,11 @@ public class SearchService {
      */
     public SearchResult findDocsByQuery(String query, String filter, int current) {
 
+
         // 从缓存中取数据query::filter::current
         String redisKey = RedisKeyUtil.getResultKey(query, filter, current);
         SearchResult cacheResult = getCache(redisKey);
+
         if (cacheResult != null) {
             return cacheResult;
         }
@@ -195,14 +195,20 @@ public class SearchService {
         // 根据docIds查询documents
         List<Document> documents = this.findDocsByIds(pageIds, keywords);
 
-        //将查询到的documents封装进searchResult
+        // 将查询到的documents封装进searchResult
         SearchResult searchResult = new SearchResult();
         searchResult.setDocuments(documents);
         searchResult.setTotal(ids.size());
         searchResult.setPage(page);
 
-        // 将searchResult放入缓存
-        initCache(redisKey, searchResult);
+        // 如果查到的documents为0，开启拼写检查
+        // 否则将searchResult放入缓存
+        if (ids.size() == 0) {
+            searchResult.setCheck(CheckByQuery(query));
+        }
+        else {
+            initCache(redisKey, searchResult);
+        }
 
         return searchResult;
     }
@@ -216,19 +222,20 @@ public class SearchService {
     private void initCache(String redisKey, SearchResult searchResult) {
         redisServiceUtil.set(redisKey, searchResult);
     }
+
     /**
      * 根据query查询提示词
      * @param query
      * @return
      */
-    public SearchResult findPromptByQuery(String query) {
-        SearchResult searchResult = new SearchResult();
-        if (hegoUtil.startsWith(query)) {
-            List<Document> PromptStr=hegoUtil.PromptString(query);
-            searchResult.setDocuments(PromptStr);
-        }
-        return  searchResult;
+    public List<String> findPromptByQuery(String query) {
 
+        if (hegoUtil.startsWith(query)) {
+            return hegoUtil.PromptString(query);
+        }
+        else {
+            return  new ArrayList<>();
+        }
     }
 
     /**
@@ -236,30 +243,9 @@ public class SearchService {
      * @param query
      * @return
      */
-    public SearchResult CheckByQuery(String query) {
+    public List<String> CheckByQuery(String query) {
 
-        List<String> tempres=ZhWordCheckers.correctList(query,10);
-
-        List<Document> CheckDoc=new ArrayList<>();
-        SearchResult searchResult = new SearchResult();
-        for(String str:tempres)
-        {
-            Document tempDoc=new Document();
-            tempDoc.setContent(str);
-            CheckDoc.add(tempDoc);
-        }
-        searchResult.setDocuments(CheckDoc);
-        return  searchResult;
+        return  ZhWordCheckers.correctList(query,10);
     }
 
-    public SearchResult TransByQuery(String query) {
-        String str= btService.translate(query);
-        List<Document> CheckDoc=new ArrayList<>();
-        SearchResult searchResult = new SearchResult();
-        Document tempDoc=new Document();
-        tempDoc.setContent(str);
-        CheckDoc.add(tempDoc);
-        searchResult.setDocuments(CheckDoc);
-        return  searchResult;
-    }
 }

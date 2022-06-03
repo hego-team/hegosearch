@@ -34,6 +34,13 @@ public class HegoUtil {
         return target;
     }
 
+    // 判断字符串是否包含中文
+    public boolean isContainChinese(String str) {
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+        Matcher m = p.matcher(str);
+        return m.find();
+    }
+
     // 初始化结巴分词字典
     @PostConstruct
     public void initJieba() {
@@ -86,7 +93,7 @@ public class HegoUtil {
 //        records = new ArrayList<>();
         try {
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                // System.out.println(line);
                 if(line.equals("keyword,count"))
                 {
                     continue;
@@ -113,7 +120,7 @@ public class HegoUtil {
         return TrieTree.startsWith(prefix);
     }
 
-    public List<Document> PromptString(String prefix)
+    public List<String> PromptString(String prefix)
     {
         return  TrieTree.PromptString(prefix);
     }
@@ -190,9 +197,9 @@ class Trie{
     }
 
     //返回所有给定前缀开头的单词
-    public List<Document> PromptString(String prefix)
+    public List<String> PromptString(String prefix)
     {
-        List<Document> resStr = new ArrayList<>();
+        List<String> resStr = new ArrayList<>();
         int len=prefix.length();
         TrieNode node = root;
         for(int i=0;i<len;i++){
@@ -203,16 +210,14 @@ class Trie{
         return  resStr;
     }
 
-    void dfs(TrieNode node,List<Document> resStr,String prefix)
+    void dfs(TrieNode node,List<String> resStr,String prefix)
     {
         for(char key:node.next.keySet())
         {
             TrieNode tempNode = node.next.get(key);
             if(tempNode.isleaf)
             {
-                Document doc=new Document();
-                doc.setContent(prefix+key);
-                resStr.add(doc);
+                resStr.add(prefix+key);
             }
             dfs(tempNode,resStr,prefix+key);
         }

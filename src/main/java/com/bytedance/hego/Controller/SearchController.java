@@ -1,11 +1,13 @@
 package com.bytedance.hego.Controller;
 
 import com.bytedance.hego.entity.SearchResult;
+import com.bytedance.hego.service.Impl.BtService;
 import com.bytedance.hego.service.SearchService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/search")
@@ -13,6 +15,9 @@ public class SearchController {
 
     @Resource
     private SearchService searchService;
+
+    @Resource
+    private BtService btService;
 
 
     // 文字搜索接口
@@ -25,7 +30,17 @@ public class SearchController {
         }
 
         long start = System.currentTimeMillis();
-        SearchResult searchResult = searchService.findDocsByQuery(query, filter, current);
+        SearchResult searchResult;
+
+        // 判断用户输入语言
+        if (query.matches("[\u4E00-\u9FA5]+")) {
+            searchResult = searchService.findDocsByQuery(query, filter, current);
+        }
+        else {
+            String transQuery= btService.translate(query);
+            searchResult = searchService.findDocsByQuery(transQuery, filter, current);
+        }
+
         // 记录查询用时
         long end = System.currentTimeMillis();
         searchResult.setTime(end - start);
@@ -53,40 +68,11 @@ public class SearchController {
 
     //提示词搜索接口
     @RequestMapping(value="/prompt", method=RequestMethod.GET)
-    public SearchResult getSearchResult(@RequestParam("query") String query)
+    public List<String> getPrompt(@RequestParam("query") String query)
     {
-        long start = System.currentTimeMillis();
-        SearchResult searchResult = searchService.findPromptByQuery(query);
-        // 记录查询前缀树用时
-        long end = System.currentTimeMillis();
-        searchResult.setTime(end - start);
-        return searchResult;
+        // 取前十个提示词返回
+        return searchService.findPromptByQuery(query).subList(0, 10);
     }
 
-    //拼写检查功能
-    @RequestMapping(value="/check", method=RequestMethod.GET)
-    public SearchResult getSearchResult(@RequestParam("query") String query,
-                                        @RequestParam(value="check") int check)
-    {
-        long start = System.currentTimeMillis();
-        SearchResult searchResult = searchService.CheckByQuery(query);
-        // 记录拼写检测用时
-        long end = System.currentTimeMillis();
-        searchResult.setTime(end - start);
-        return searchResult;
-    }
-
-    //英文翻译功能
-    @RequestMapping(value="/trans", method=RequestMethod.GET)
-    public SearchResult getSearchResult(@RequestParam("query") String query,
-                                        @RequestParam(value="trans") String trans)
-    {
-        long start = System.currentTimeMillis();
-        SearchResult searchResult = searchService.TransByQuery(query);
-        // 记录翻译用时
-        long end = System.currentTimeMillis();
-        searchResult.setTime(end - start);
-        return searchResult;
-    }
 
 }
