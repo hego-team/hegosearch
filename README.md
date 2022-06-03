@@ -82,73 +82,70 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 ## 搜索模块
 
 ### 已完成
-
+文本搜索功能
 1. 搜索文本/图片信息
 2. 搜索结果分页，每页最多10条结果
 3. 关键词高亮
 
-    接口示例：GET /hego/result?query=医院患者&page=10
+    接口示例：GET http://localhost:8443/hego/search/text?query=医院患者&page=6
     
-    ```
-    {
-        "time": 26.0     // 响应时间ms
-        "total": 2134    // 查询结果总数
-        "documents": [   // 查询结果
-          {
-            "docId":99374,
-            "content":"西京<em>医院</em>脊柱外科专家团队为<em>患者</em>进行手术."，
-            "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Ftranslate%2F386%2Fw729h457%2F20180712%2F-e3y-hfefkqr1069131.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630786327&t=95892981d9a434b2106fa3c07f55212d"
-          },
-          {
-            "docId": 68063,
-            "content": "[转载]颈椎病<em>患者</em>全身运动-青岛洪强骨科<em>医院</em>",
-            "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fs8.sinaimg.cn%2Fmiddle%2F78eb8059hbbf4ac2408a0%26690&refer=http%3A%2F%2Fs8.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630659895&t=186f73a556e74867dcf7874e3891521f"
-          },
-          ...
-        ],
-        "page":         // 分页信息
-          {"current":10,"limit":10,"rows":2134,"start":90,"end":100,"total":214,"from":5,"to":15}
-    }
-    ```
-3. 关键词过滤
+4. 关键词过滤
 
-    接口示例：GET /hego/result?query=医院患者&filter=医院&page=10
-     ```
-        {
-            "time": 28.0        // 响应时间ms
-            "total": 514        // 查询结果总数
-            "documents": [...]  // 查询结果
-            "page": {...}       // 分页信息
-              
-        }
-     ```     
-4. 以图搜图功能
+    接口示例：GET http://localhost:8443/hego/search/text?query=学校&filter=学生&page=6
+ 
+5. 提示器\拼写检查功能：
+ 
+    基于困惑集实现常见错误的纠错功能，困惑集存储在src\main\resources\data\word_checker_zh.txt下
+      
+    接口实例：GET http://localhost:8443/hego/search/text?query=学的校&page=6
 
-    调用百度通用物体和场景识别接口实现图片转query，再通过query查询
+6. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，调百度翻译API
+    https://fanyi-api.baidu.com/api/trans/product/apidoc#appendix
     
-    百度API: https://ai.baidu.com/ai-doc/IMAGERECOGNITION/Xk3bcxe21
-    
-    接口：POST /hego/search/image
-    
-    示例parameters: file = "本地图片", page = 1
-    
-    ```
-    {
-        "time": 0.0,
-        "total": 2401,
-        "documents": [
-            {
-                "docId": 246154,
-                "content": "我爱你 电影<em>截图</em>",
-                "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fitem%2F201702%2F01%2F20170201120550_eV3kn.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630826106&t=b29b0a9b466df10005fc51979d8af552"
-            },
-        ...
-        ],
-        "page": {...}
-    ```
-    
-    
-    
+    接口实例：GET http://localhost:8443/hego/search/text?query=school&page=6
+
+返回JSON示例
+```
+{
+    "time": 26.0     // 响应时间ms
+    "total": 2134    // 查询结果总数
+    "documents": [   // 查询结果
+      {
+        "docId":99374,
+        "content":"西京<em>医院</em>脊柱外科专家团队为<em>患者</em>进行手术."，
+        "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Ftranslate%2F386%2Fw729h457%2F20180712%2F-e3y-hfefkqr1069131.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630786327&t=95892981d9a434b2106fa3c07f55212d"
+      },
+      {
+        "docId": 68063,
+        "content": "[转载]颈椎病<em>患者</em>全身运动-青岛洪强骨科<em>医院</em>",
+        "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fs8.sinaimg.cn%2Fmiddle%2F78eb8059hbbf4ac2408a0%26690&refer=http%3A%2F%2Fs8.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630659895&t=186f73a556e74867dcf7874e3891521f"
+      },
+      ...
+    ],
+    "check": []     // 查询结果为空时开启拼写检查
+    "page":         // 分页信息
+      {"current":10,"limit":10,"rows":2134,"start":90,"end":100,"total":214,"from":5,"to":15}
+}
+```   
+#### 图片搜索功能
+
+调用百度通用物体和场景识别接口实现图片转query，再通过query查询
+
+百度API: https://ai.baidu.com/ai-doc/IMAGERECOGNITION/Xk3bcxe21
+
+接口：POST http://localhost:8443/hego/search/image
+
+示例parameters: Multipartfile = "本地图片", page = 1
+
+#### 搜索提示词功能
+ 
+将数据集中词频大于5的关键词构建前缀树，返回前十个高频提示词
+
+接口示例：GET http://localhost:8443/hego/search/prompt?query=中国 
+
+```
+["中国馆","中国文联","中国美术学院","中国美术馆","中国美术家协会","中国戏曲","中国戏剧出版社","中国式","中国林业","中国香港"]
+```
     
 ### 待完成
 
@@ -161,25 +158,15 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 参考ES的功能
 https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
-1. 搜索提示词功能：
- 
-    将数据集中词频大于5的关键词构建前缀树，接口示例：http://localhost:8443/hego/search/prompt?query=中国
-2. 提示器\拼写检查功能：
 
-     基于困惑集实现常见错误的纠错功能，困惑集存储在src\main\resources\data\word_checker_zh.txt下
-     
-     接口实例：http://localhost:8443/hego/search/check?query=万变不离其中&check=0
-3. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，调百度翻译API
-    https://fanyi-api.baidu.com/api/trans/product/apidoc#appendix
-    
-    接口实例：http://localhost:8443/hego/search/trans?query=school&trans=2
+
 4. 同义词搜索功能
 
     暂时未找到对应的同义词词库，找到了一个开源的python同义词转换工具：https://github.com/chatopera/Synonyms
 
 #### 搜索性能优化
 1. 查询速度提升 
-    1. redis缓存doc
+    1. redis缓存doc 
     2. 多线程搜索
     3. leveldb优化？
     4. jvm调优？
