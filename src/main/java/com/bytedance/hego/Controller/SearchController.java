@@ -24,7 +24,8 @@ public class SearchController {
     @RequestMapping(value="/text", method=RequestMethod.GET)
     public SearchResult getSearchResult(@RequestParam("query") String query,
                                         @RequestParam(value = "filter", required = false) String filter,
-                                        @RequestParam(value = "page") int current) {
+                                        @RequestParam(value = "page") int current,
+                                        @RequestParam(value = "limit") int limit) {
         if (filter == null) {
             filter = "";
         }
@@ -34,11 +35,11 @@ public class SearchController {
 
         // 判断用户输入语言
         if (query.matches("[\u4E00-\u9FA5]+")) {
-            searchResult = searchService.findDocsByQuery(query, filter, current);
+            searchResult = searchService.findDocsByQuery(query, filter, current, limit);
         }
         else {
             String transQuery= btService.translate(query);
-            searchResult = searchService.findDocsByQuery(transQuery, filter, current);
+            searchResult = searchService.findDocsByQuery(transQuery, filter, current, limit);
         }
 
         // 记录查询用时
@@ -51,7 +52,9 @@ public class SearchController {
     @RequestMapping(value="/image", method=RequestMethod.POST)
     public SearchResult getSearchResult(@RequestParam("file") MultipartFile file,
                                         @RequestParam(value = "filter", required = false) String filter,
-                                        @RequestParam(value = "page") int current) {
+                                        @RequestParam(value = "page") int current,
+                                        @RequestParam(value = "limit") int limit) {
+
         long start = System.currentTimeMillis();
 
         if (filter == null) {
@@ -59,7 +62,7 @@ public class SearchController {
         }
 
         String query = searchService.imageToQuery(file);
-        SearchResult searchResult = searchService.findDocsByQuery(query, filter, current);
+        SearchResult searchResult = searchService.findDocsByQuery(query, filter, current, limit);
 
         long end = System.currentTimeMillis();
         searchResult.setTime(end - start);

@@ -150,11 +150,11 @@ public class SearchService {
      * @param query 用户输入的查询内容
      * @return searchResult 查询结果
      */
-    public SearchResult findDocsByQuery(String query, String filter, int current) {
+    public SearchResult findDocsByQuery(String query, String filter, int current, int limit) {
 
 
         // 从缓存中取数据query::filter::current
-        String redisKey = RedisKeyUtil.getResultKey(query, filter, current);
+        String redisKey = RedisKeyUtil.getResultKey(query, filter, current, limit);
         SearchResult cacheResult = getCache(redisKey);
 
         if (cacheResult != null) {
@@ -187,6 +187,7 @@ public class SearchService {
         Page page = new Page();
         page.setRows(rankIds.size());
         page.setCurrent(Math.min(current, page.getTotal()));
+        page.setLimit(Math.max(limit, 0));
         // 当前页的起止document
         int start = page.getStart();
         int end = page.getEnd();
