@@ -1,9 +1,11 @@
 package com.bytedance.hego.Controller;
 
 import com.bytedance.hego.entity.SearchResult;
-import com.bytedance.hego.service.Impl.BtService;
 import com.bytedance.hego.service.SearchService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -15,9 +17,6 @@ public class SearchController {
 
     @Resource
     private SearchService searchService;
-
-    @Resource
-    private BtService btService;
 
 
     // 文字搜索接口
@@ -33,14 +32,10 @@ public class SearchController {
         long start = System.currentTimeMillis();
         SearchResult searchResult;
 
-        // 判断用户输入语言
-        if (query.matches("[\u4E00-\u9FA5]+")) {
-            searchResult = searchService.findDocsByQuery(query, filter, current, limit);
-        }
-        else {
-            String transQuery= btService.translate(query);
-            searchResult = searchService.findDocsByQuery(transQuery, filter, current, limit);
-        }
+        // 翻译query中的英文
+        String transQuery= searchService.transQuery(query);
+        searchResult = searchService.findDocsByQuery(transQuery, filter, current, limit);
+
 
         // 记录查询用时
         long end = System.currentTimeMillis();
@@ -74,7 +69,8 @@ public class SearchController {
     public List<String> getPrompt(@RequestParam("query") String query)
     {
         // 取前十个提示词返回
-        return searchService.findPromptByQuery(query).subList(0, 10);
+        List<String> prompts = searchService.findPromptByQuery(query);
+        return prompts.subList(0, Math.min(10, prompts.size()));
     }
 
 

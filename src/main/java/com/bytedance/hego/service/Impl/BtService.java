@@ -70,8 +70,6 @@ public class BtService {
     /**
      *
      * @param word：要翻译的词条
-     * @param from：源语种
-     * @param to：目标语种
      * @return 获取翻译的结果
      */
     public  String translate(String word){

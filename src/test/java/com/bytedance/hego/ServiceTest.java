@@ -122,8 +122,12 @@ public class ServiceTest {
     }
 
     @Test
-    void testImageToKeywords() {
+    public void testImageToKeywords() {
         // searchService.imageToQuery();
     }
 
+    @Test
+    public void testTransQuery() {
+        searchService.transQuery("search引擎");
+    }
 }

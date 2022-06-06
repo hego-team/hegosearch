@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class SearchService {
@@ -29,6 +31,9 @@ public class SearchService {
 
     @Resource
     private RedisServiceUtil redisServiceUtil;
+
+    @Resource
+    private BtService btService;
 
 
     /**
@@ -249,4 +254,23 @@ public class SearchService {
         return  ZhWordCheckers.correctList(query,10);
     }
 
+    /**
+     * 从字符串中提取英文并翻译
+     */
+    public String transQuery(String query) {
+
+        String regex = "[a-zA-Z]+";
+        //Creating a pattern object
+        Pattern pattern = Pattern.compile(regex);
+        //Creating a Matcher object
+        Matcher matcher = pattern.matcher(query);
+
+        // System.out.println(btService.translate("schoolstudent学习math"));
+        if (matcher.find()) {
+            return btService.translate(query);
+        } else {
+            return query;
+        }
+
+    }
 }
