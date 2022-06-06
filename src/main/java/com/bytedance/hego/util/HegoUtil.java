@@ -78,7 +78,7 @@ public class HegoUtil {
     public void initTireIndex()
     {
         TrieTree=new Trie();
-        File csv = new File("data\\tireIndex\\dictionary.csv");
+        File csv = new File("data/tireIndex/dictionary.csv");
         csv.setReadable(true);
         csv.setWritable(true);
         InputStreamReader isr = null;
