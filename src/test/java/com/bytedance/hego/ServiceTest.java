@@ -97,7 +97,7 @@ public class ServiceTest {
     @Test
     void testFindDocsByQuery() {
         String query = "医院患者";
-        SearchResult searchResult = searchService.findDocsByQuery(query, "", 2);
+        SearchResult searchResult = searchService.findDocsByQuery(query, "", 2, 1);
         System.out.println(searchResult);
 
         Map<Integer, Double> keywords = new HashMap<>();
