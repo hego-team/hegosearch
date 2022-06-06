@@ -25,13 +25,13 @@ search engine ，java implemention
     pip install -r requirements.txt
     ```
 4. 把数据集放到script目录下然后运行脚本
-    
+   
     数据集：https://pan.baidu.com/s/1nxGKhtbX--QRl0wCCGe7Ng 
         提取码：7mi1 
 
     ```
    python init_index.py
-    ```
+   ```
 #### 运行结果
 运行脚本后在data目录下生成doc, invertedIndex, positiveIndex
 
@@ -82,70 +82,73 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 ## 搜索模块
 
 ### 已完成
-#### 文本搜索功能
+
 1. 搜索文本/图片信息
 2. 搜索结果分页，每页最多10条结果
 3. 关键词高亮
 
-    接口示例：GET http://localhost:8443/hego/search/text?query=医院患者&page=6&limit=10
+    接口示例：GET /hego/result?query=医院患者&page=10
     
-4. 关键词过滤
+    ```
+    {
+        "time": 26.0     // 响应时间ms
+        "total": 2134    // 查询结果总数
+        "documents": [   // 查询结果
+          {
+            "docId":99374,
+            "content":"西京<em>医院</em>脊柱外科专家团队为<em>患者</em>进行手术."，
+            "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Ftranslate%2F386%2Fw729h457%2F20180712%2F-e3y-hfefkqr1069131.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630786327&t=95892981d9a434b2106fa3c07f55212d"
+          },
+          {
+            "docId": 68063,
+            "content": "[转载]颈椎病<em>患者</em>全身运动-青岛洪强骨科<em>医院</em>",
+            "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fs8.sinaimg.cn%2Fmiddle%2F78eb8059hbbf4ac2408a0%26690&refer=http%3A%2F%2Fs8.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630659895&t=186f73a556e74867dcf7874e3891521f"
+          },
+          ...
+        ],
+        "page":         // 分页信息
+          {"current":10,"limit":10,"rows":2134,"start":90,"end":100,"total":214,"from":5,"to":15}
+    }
+    ```
+3. 关键词过滤
 
-    接口示例：GET http://localhost:8443/hego/search/text?query=学校&filter=学生&page=6&limit=10
- 
-5. 提示器\拼写检查功能：
- 
-    基于困惑集实现常见错误的纠错功能，困惑集存储在src\main\resources\data\word_checker_zh.txt下
-      
-    接口实例：GET http://localhost:8443/hego/search/text?query=学的校&page=6&limit=10
+    接口示例：GET /hego/result?query=医院患者&filter=医院&page=10
+     ```
+        {
+            "time": 28.0        // 响应时间ms
+            "total": 514        // 查询结果总数
+            "documents": [...]  // 查询结果
+            "page": {...}       // 分页信息
+              
+        }
+     ```
+4. 以图搜图功能
 
-6. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，调百度翻译API
-    https://fanyi-api.baidu.com/api/trans/product/apidoc#appendix
+    调用百度通用物体和场景识别接口实现图片转query，再通过query查询
     
-    接口实例：GET http://localhost:8443/hego/search/text?query=school&page=6&limit=10
-
-返回JSON示例
-```
-{
-    "time": 26.0     // 响应时间ms
-    "total": 2134    // 查询结果总数
-    "documents": [   // 查询结果
-      {
-        "docId":99374,
-        "content":"西京<em>医院</em>脊柱外科专家团队为<em>患者</em>进行手术."，
-        "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Ftranslate%2F386%2Fw729h457%2F20180712%2F-e3y-hfefkqr1069131.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630786327&t=95892981d9a434b2106fa3c07f55212d"
-      },
-      {
-        "docId": 68063,
-        "content": "[转载]颈椎病<em>患者</em>全身运动-青岛洪强骨科<em>医院</em>",
-        "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fs8.sinaimg.cn%2Fmiddle%2F78eb8059hbbf4ac2408a0%26690&refer=http%3A%2F%2Fs8.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630659895&t=186f73a556e74867dcf7874e3891521f"
-      },
-      ...
-    ],
-    "check": []     // 查询结果为空时开启拼写检查
-    "page":         // 分页信息
-      {"current":10,"limit":10,"rows":2134,"start":90,"end":100,"total":214,"from":5,"to":15}
-}
-```   
-#### 图片搜索功能
-
-调用百度通用物体和场景识别接口实现图片转query，再通过query查询
-
-百度API: https://ai.baidu.com/ai-doc/IMAGERECOGNITION/Xk3bcxe21
-
-接口：POST http://localhost:8443/hego/search/image
-
-示例parameters: Multipartfile = "本地图片", page = 1
-
-#### 搜索提示词功能
- 
-将数据集中词频大于5的关键词构建前缀树，返回前十个高频提示词
-
-接口示例：GET http://localhost:8443/hego/search/prompt?query=中国 
-
-```
-["中国馆","中国文联","中国美术学院","中国美术馆","中国美术家协会","中国戏曲","中国戏剧出版社","中国式","中国林业","中国香港"]
-```
+    百度hego: https://ai.baidu.com/ai-doc/IMAGERECOGNITION/Xk3bcxe21
+    
+    接口：POST /hego/search/image
+    
+    示例parameters: file = "本地图片", page = 1
+    
+    ```
+    {
+        "time": 0.0,
+        "total": 2401,
+        "documents": [
+            {
+                "docId": 246154,
+                "content": "我爱你 电影<em>截图</em>",
+                "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fitem%2F201702%2F01%2F20170201120550_eV3kn.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630826106&t=b29b0a9b466df10005fc51979d8af552"
+            },
+        ...
+        ],
+        "page": {...}
+    ```
+    
+    
+    
     
 ### 待完成
 
@@ -158,25 +161,444 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 
 参考ES的功能
 https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
-
-
+1. 搜索提示词功能：例如用户输入字节可以提示字节跳动，用所有词频大于某个阈值的关键词构建前缀树实现
+    https://developer.aliyun.com/article/765914
+2. 提示器\拼写检查功能：向搜索体验中加入 did-you-mean（您指的是 XXX 吗）功能，让用户能够选择改正后的整个短语。例如用户输入学的校可以搜到学校的结果。
+3. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，可以调百度翻译hego
+    https://fanyi-hego.baidu.com/hego/trans/product/hegodoc#appendix
 4. 同义词搜索功能
-
-    暂时未找到对应的同义词词库，找到了一个开源的python同义词转换工具：https://github.com/chatopera/Synonyms
 
 #### 搜索性能优化
 1. 查询速度提升 
-    1. redis缓存doc 
+    1. redis缓存doc
     2. 多线程搜索
     3. leveldb优化？
     4. jvm调优？
     
 2. 数据量扩充
 
-
 ## 用户模块
+
 ### 待完成
+
 1. 用户注册、登录、注销功能
 2. 用户收藏夹功能
 3. 用户搜索历史记录功能(option)
 4. 用户最常搜索功能(option)
+
+
+
+当前：
+
+### 初始化
+
+1. 运行script/init_sql.sql文件初始化数据库数据。
+1. 改数据库的端口，用户名，密码配置。
+
+### 功能：
+
+### 用户相关请求：
+
+1. 使用session控制用户登录状态。
+2. 通过对用户表操作实现登录，登出，注册，注销（删号），改密，改信息。
+
+##### 打开页面
+
+GET http://localhost:8443/hego/
+
+没有前端，未实现。
+
+##### 进入已登录界面？
+
+GET http://localhost:8443/hego/admin
+
+没有前端，未实现。
+
+
+
+##### 登录
+
+POST http://localhost:8443/hego/login?name=Default&password=Default
+
+- 参数：用户名、密码。
+
+返回的json示例：（登录用户的全部的用户信息，role表示用户权限等级，目前没有用；lastLoginTime是上次登录时间，目前没有用；）
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "user": {
+            "id": 1,
+            "name": "Default",
+            "password": "Default",
+            "role": 1,
+            "email": "1111111111@qq.com",
+            "lastLoginTime": 1653955582967
+        }
+    }
+}
+```
+
+其他示例：
+
+http://localhost:8443/hego/login?name=John&password=111111
+
+
+
+##### 登出
+
+GET http://localhost:8443/hego/logout
+
+- 无参数。
+- 退出当前账户。
+
+json示例：返回成功或错误信息。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+##### 注册
+
+POST http://localhost:8443/hego/register?name=John&password=111111&rePassword=111111&email=john@163.com
+
+- 参数：用户名、密码、重复密码、邮箱信息（可选）
+
+json示例：
+
+（目前不能检查email格式；目前密码只有位数限制；用户名有非重复限制；成功返回用户信息；失败返回错误类型提示；通过注册只能添加0级普通账户；）
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "user": {
+            "id": 2,
+            "name": "John",
+            "password": "111111",
+            "role": 0,
+            "email": "john@163.com",
+            "lastLoginTime": 1653956412000
+        }
+    }
+}
+```
+
+
+
+##### 注销（删除）账户
+
+DELETE http://localhost:8443/hego/user/delete
+
+- /
+
+- 无参数，注销当前用户。
+
+json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+##### 改信息
+
+POST http://localhost:8443/hego/user/save?name=John&email=11111@qq.com
+
+- 根据当前session中用户id查找，修改名称、邮箱个人信息。
+
+json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+##### 改密
+
+PUT http://localhost:8443/hego/user/change_password?oldPass=111111&newPass=222222&reNewPass=222222
+
+- 参数：旧密、新密、重复新密。
+
+json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+### 收藏夹相关请求。 TAGS:
+
+1. 对数据表操作实现了收藏夹的增删改查。
+2. 条目有name不能重复限制，方便不根据id（主键）而根据name修改删除。
+3. 无用户登录状态不提供收藏功能。（如果意外发出收藏请求，返回信息”请先登录”）。
+
+##### 添加条目
+
+POST http://localhost:8443/hego/tags/add?newname=1111&newurl=xxxxx
+
+- 参数：新条目名称、新条目url。
+
+返回json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": "已添加到收藏夹",
+    "data": null
+}
+```
+
+
+
+##### 获得当前用户的收藏夹
+
+GET http://localhost:8443/hego/tags/list
+
+- 无参数。
+
+返回json示例：返回当前用户（owner）的所有收藏条目。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "tagsList": [
+            {
+                "id": 2,
+                "owner": "John",
+                "name": "1111",
+                "url": "xxxxx"
+            },
+            {
+                "id": 3,
+                "owner": "John",
+                "name": "2222",
+                "url": "yyyyy"
+            }
+        ]
+    }
+}
+```
+
+
+
+##### 删除条目
+
+DELETE http://localhost:8443/hego/tags/delete?name=1111
+//按名称删除收藏夹项。
+
+返回json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+##### 编辑收藏夹项
+
+POST http://localhost:8443/hego/tags/save?oldname=百度一下，也不知道&newname=百度一下，你就知道&newurl=https://www.baidu.com
+
+- 按名称编辑收藏夹项。
+
+- 此示例的数据是由sql脚本生成的初始数据，在Default用户的收藏夹内。
+
+返回json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+### 历史记录相关请求。HIS：
+
+1. 通过操作数据库实现历史记录的增删查（两种）。
+2. 条目添加无限制。
+3. 无登录状态不保存历史记录。
+
+##### 搜索时自动触发添加
+
+POST http://localhost:8443/hego/his/add?newcontent=1111
+
+- 可多次添加相同项通过times++计频数。
+- 添加条目到当前用户历史记录中。
+
+返回json示例：返回成功或失败（当前无用户登录），均无提示信息。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+其他示例：
+
+http://localhost:8443/hego/his/add?newcontent=2222
+
+http://localhost:8443/hego/his/add?newcontent=3333
+
+
+
+##### 删除
+
+DELETE http://localhost:8443/hego/his/delete?content=1111
+
+- 通过content项查询当前用户历史并删除。
+
+返回json示例：返回成功或失败提示信息。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+##### 时间排序查看
+
+GET http://localhost:8443/hego/his/list/default
+
+- 返回按加入顺序（从早到晚，前端展示可能要逆序）排列的搜索历史记录。
+- 无参数，default表示默认顺序。
+- 只能查看当前用户的历史记录。
+
+返回json示例：
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "hisList": [
+            {
+                "id": 1,
+                "owner": "Default",
+                "content": "1111",
+                "times": 2
+            },
+            {
+                "id": 3,
+                "owner": "Default",
+                "content": "2222",
+                "times": 1
+            },
+            {
+                "id": 4,
+                "owner": "Default",
+                "content": "3333",
+                "times": 3
+            }
+        ]
+    }
+}
+```
+
+
+
+##### 频度排序查看
+
+GET http://localhost:8443/hego/his/list/sort
+
+- 返回按频度顺序（从高频到低频）排列的搜索历史记录。
+- 无参数，sort表示频度顺序。
+- 只能查看当前用户的历史记录。
+
+返回json示例：
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "hisList": [
+            {
+                "id": 4,
+                "owner": "Default",
+                "content": "3333",
+                "times": 3
+            },
+            {
+                "id": 1,
+                "owner": "Default",
+                "content": "1111",
+                "times": 2
+            },
+            {
+                "id": 3,
+                "owner": "Default",
+                "content": "2222",
+                "times": 1
+            }
+        ]
+    }
+}
+```
+
+
+
+
+
