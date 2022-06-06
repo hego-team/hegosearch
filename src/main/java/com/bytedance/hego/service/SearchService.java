@@ -1,5 +1,7 @@
 package com.bytedance.hego.service;
 
+import com.bytedance.hego.service.Impl.BtService;
+import com.bytedance.hego.util.ZhWordCheckers;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.bytedance.hego.entity.Document;
@@ -148,11 +150,13 @@ public class SearchService {
      * @param query 用户输入的查询内容
      * @return searchResult 查询结果
      */
-    public SearchResult findDocsByQuery(String query, String filter, int current) {
+    public SearchResult findDocsByQuery(String query, String filter, int current, int limit) {
+
 
         // 从缓存中取数据query::filter::current
-        String redisKey = RedisKeyUtil.getResultKey(query, filter, current);
+        String redisKey = RedisKeyUtil.getResultKey(query, filter, current, limit);
         SearchResult cacheResult = getCache(redisKey);
+
         if (cacheResult != null) {
             return cacheResult;
         }
@@ -183,6 +187,7 @@ public class SearchService {
         Page page = new Page();
         page.setRows(rankIds.size());
         page.setCurrent(Math.min(current, page.getTotal()));
+        page.setLimit(Math.max(limit, 0));
         // 当前页的起止document
         int start = page.getStart();
         int end = page.getEnd();
@@ -191,14 +196,20 @@ public class SearchService {
         // 根据docIds查询documents
         List<Document> documents = this.findDocsByIds(pageIds, keywords);
 
-        //将查询到的documents封装进searchResult
+        // 将查询到的documents封装进searchResult
         SearchResult searchResult = new SearchResult();
         searchResult.setDocuments(documents);
         searchResult.setTotal(ids.size());
         searchResult.setPage(page);
 
-        // 将searchResult放入缓存
-        initCache(redisKey, searchResult);
+        // 如果查到的documents为0，开启拼写检查
+        // 否则将searchResult放入缓存
+        if (ids.size() == 0) {
+            searchResult.setCheck(CheckByQuery(query));
+        }
+        else {
+            initCache(redisKey, searchResult);
+        }
 
         return searchResult;
     }
@@ -212,4 +223,30 @@ public class SearchService {
     private void initCache(String redisKey, SearchResult searchResult) {
         redisServiceUtil.set(redisKey, searchResult);
     }
+
+    /**
+     * 根据query查询提示词
+     * @param query
+     * @return
+     */
+    public List<String> findPromptByQuery(String query) {
+
+        if (hegoUtil.startsWith(query)) {
+            return hegoUtil.PromptString(query);
+        }
+        else {
+            return  new ArrayList<>();
+        }
+    }
+
+    /**
+     * 根据query纠正结果
+     * @param query
+     * @return
+     */
+    public List<String> CheckByQuery(String query) {
+
+        return  ZhWordCheckers.correctList(query,10);
+    }
+
 }

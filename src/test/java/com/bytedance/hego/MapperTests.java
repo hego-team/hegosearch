@@ -24,7 +24,7 @@ public class MapperTests {
         User user = new User();
 
         user.setName("建国500");
-
+        user.setAge(75);
         user.setEmail("jiangguxxxo@qq.com");
         //user.setCreateTime(LocalDateTime.now());
         //user.setUpdadeTime(LocalDateTime.now());
@@ -63,8 +63,8 @@ public class MapperTests {
 
         // UPDATE User SET age=?, data_time=? WHERE uid=?
         User user = new User();
-        user.setId(18);
-
+        user.setId(18L);
+        user.setAge(50);
         //注意：update时生成的sql自动是动态sql
         //其他的属性值不变
         int result = userMapper.updateById(user);

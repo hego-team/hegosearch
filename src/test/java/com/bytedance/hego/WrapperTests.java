@@ -79,7 +79,7 @@ public class WrapperTests {
 
         //组装更新条件
         User user = new User();
-
+        user.setAge(18);
         user.setEmail("user@atguigu.com");
 
         //执行更新
@@ -221,7 +221,9 @@ public class WrapperTests {
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper
                 //避免使用字符串表示数据库字段，防止运行时错误
-                .like(StringUtils.isNotBlank(username),User::getName,username);
+                .like(StringUtils.isNotBlank(username),User::getName,username)
+                .ge(agebegin!= null,User::getAge,agebegin)
+                .le(ageend!=null,User::getAge,ageend);
 
         //若某一个条件输入为空，则不会在queryWrapper组装
         List<User> users = userMapper.selectList(queryWrapper);
@@ -239,8 +241,10 @@ public class WrapperTests {
         //组装查询条件和更新条件
         LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper
+                .set(User::getAge,18)
                 .set(User::getEmail,"user@atguigu.com")
-                .like(User::getName,"花");  //lambda表达式内的逻辑优先运算
+                .like(User::getName,"花")
+                .and(i-> i.lt(User::getAge,23).or().isNull(User::getEmail));  //lambda表达式内的逻辑优先运算
 
         User user = new User();
         int update = userMapper.update(user, updateWrapper);
