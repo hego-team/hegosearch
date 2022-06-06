@@ -87,22 +87,22 @@ positiveIndex：保存正排索引，之后实现插入、删除索引时可用�
 2. 搜索结果分页，每页最多10条结果
 3. 关键词高亮
 
-    接口示例：GET http://localhost:8443/hego/search/text?query=医院患者&page=6
+    接口示例：GET http://localhost:8443/hego/search/text?query=医院患者&page=6&limit=10
     
 4. 关键词过滤
 
-    接口示例：GET http://localhost:8443/hego/search/text?query=学校&filter=学生&page=6
+    接口示例：GET http://localhost:8443/hego/search/text?query=学校&filter=学生&page=6&limit=10
  
 5. 提示器\拼写检查功能：
  
     基于困惑集实现常见错误的纠错功能，困惑集存储在src\main\resources\data\word_checker_zh.txt下
       
-    接口实例：GET http://localhost:8443/hego/search/text?query=学的校&page=6
+    接口实例：GET http://localhost:8443/hego/search/text?query=学的校&page=6&limit=10
 
 6. 跨语言搜索功能：输入query不是中文时，将query翻译成中文查询，调百度翻译API
     https://fanyi-api.baidu.com/api/trans/product/apidoc#appendix
     
-    接口实例：GET http://localhost:8443/hego/search/text?query=school&page=6
+    接口实例：GET http://localhost:8443/hego/search/text?query=school&page=6&limit=10
 
 返回JSON示例
 ```
