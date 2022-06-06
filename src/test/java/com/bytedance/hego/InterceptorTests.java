@@ -1,7 +1,7 @@
 package com.bytedance.hego;
 
 import com.bytedance.hego.entity.Product;
-import com.bytedance.hego.entity.User;
+//import com.bytedance.hego.entity.User;
 import com.bytedance.hego.mapper.ProductMapper;
 import com.bytedance.hego.mapper.UserMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -29,38 +29,38 @@ public class InterceptorTests {
     /**
      * 分页配置测试方法
      */
-    @Test
-    //分页插件
-    public void testSelectPage(){
-        //new分页对象。查询第一页，每页5条记录
-        Page<User> pageparms = new Page<User>(1, 5);
-
-        //两个参数：1、分页对象  2、查询对象
-        Page<User> userPage = userMapper.selectPage(pageparms,null);
-
-        //不但完成了分页的查询，还把分好页需要展示的一些额外的辅助的内容比如总记录数，有没有上下页等内容计算好组织到userPage对象里面，方便获取
-        List<User> records = userPage.getRecords();
-        records.forEach(System.out::println);
-
-        long total = userPage.getTotal();
-        System.out.println(total);
-
-        boolean b = userPage.hasNext();
-        System.out.println("下一页？"+b);
-
-        boolean b1 = userPage.hasPrevious();
-        System.out.println("上一页？"+b1);
-
-    }
+//    @Test
+//    //分页插件
+//    public void testSelectPage(){
+//        //new分页对象。查询第一页，每页5条记录
+//        Page<User> pageparms = new Page<User>(1, 5);
+//
+//        //两个参数：1、分页对象  2、查询对象
+//        Page<User> userPage = userMapper.selectPage(pageparms,null);
+//
+//        //不但完成了分页的查询，还把分好页需要展示的一些额外的辅助的内容比如总记录数，有没有上下页等内容计算好组织到userPage对象里面，方便获取
+//        List<User> records = userPage.getRecords();
+//        records.forEach(System.out::println);
+//
+//        long total = userPage.getTotal();
+//        System.out.println(total);
+//
+//        boolean b = userPage.hasNext();
+//        System.out.println("下一页？"+b);
+//
+//        boolean b1 = userPage.hasPrevious();
+//        System.out.println("上一页？"+b1);
+//
+//    }
 
     //自定义分页
-    @Test
-    public void testSelectPageByAge(){
-        Page<User> pageparms = new Page<User>(1, 5);
-        IPage<User> userIPage = userMapper.selectPageByAge(pageparms, 30);
-        List<User> records = userIPage.getRecords();
-        records.forEach(System.out::println);
-    }
+//    @Test
+//    public void testSelectPageByAge(){
+//        Page<User> pageparms = new Page<User>(1, 5);
+//        IPage<User> userIPage = userMapper.selectPageByAge(pageparms, 30);
+//        List<User> records = userIPage.getRecords();
+//        records.forEach(System.out::println);
+//    }
 
 
     /**

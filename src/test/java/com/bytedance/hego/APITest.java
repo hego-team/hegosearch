@@ -2,7 +2,6 @@ package com.bytedance.hego;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.bytedance.hego.entity.Document;
 import com.bytedance.hego.service.AuthService;
 import com.bytedance.hego.service.Impl.BtService;
 import com.bytedance.hego.service.SearchService;
