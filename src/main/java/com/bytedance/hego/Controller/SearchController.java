@@ -33,7 +33,7 @@ public class SearchController {
         SearchResult searchResult;
 
         // 翻译query中的英文
-        String transQuery= searchService.transQuery(query);
+        String transQuery= searchService.transQuery(query.replaceAll(" ", ""));
         searchResult = searchService.findDocsByQuery(transQuery, filter, current, limit);
 
 

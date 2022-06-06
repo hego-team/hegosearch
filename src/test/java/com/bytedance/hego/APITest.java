@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.bytedance.hego.entity.Document;
 import com.bytedance.hego.service.AuthService;
+import com.bytedance.hego.service.Impl.BtService;
 import com.bytedance.hego.service.SearchService;
 import com.bytedance.hego.util.Base64Util;
 import com.bytedance.hego.util.FileUtil;
 import com.bytedance.hego.util.HttpUtil;
+import com.bytedance.hego.util.ZhWordCheckers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,6 +31,9 @@ public class APITest {
 
     @Resource
     private SearchService searchService;
+
+    @Resource
+    private BtService btService;
 
     /**
      * 通用物体和场景识别api测试
@@ -67,7 +72,15 @@ public class APITest {
         }
     }
 
+    @Test
+    public void testTransAPI() {
+        System.out.println("schoolstudent学习math搜索answer");
+        System.out.println(btService.translate("schoolstudent学习math搜索answer"));
+    }
 
-
+    @Test
+    public void testCheckAPI() {
+        System.out.println(ZhWordCheckers.correctList("跑的飞快",10));
+    }
 
 }
