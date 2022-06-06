@@ -210,6 +210,7 @@ public class SearchService {
         // 如果查到的documents为0，开启拼写检查
         // 否则将searchResult放入缓存
         if (ids.size() == 0) {
+            System.out.println(CheckByQuery(query));
             searchResult.setCheck(CheckByQuery(query));
         }
         else {
@@ -265,7 +266,6 @@ public class SearchService {
         //Creating a Matcher object
         Matcher matcher = pattern.matcher(query);
 
-        // System.out.println(btService.translate("schoolstudent学习math"));
         if (matcher.find()) {
             return btService.translate(query);
         } else {
