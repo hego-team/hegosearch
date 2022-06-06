@@ -21,10 +21,35 @@ public class ServiceTest {
     @Resource
     private SearchService searchService;
 
+    @Test
+    public void testCount(){
 
+        //SELECT COUNT( * ) FROM user
+        int count = userService.count();
+        System.out.println("user表记录数："+count);
+    }
 
+    @Test
+    public void testSaveBatch(){
 
+        ArrayList<User> users = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            User user = new User();
+            user.setId(i+6);
+            user.setAge(20+i);
+            user.setName("花花"+i);
+            users.add(user);
+        }
 
+        boolean b = userService.saveBatch(users);
+        System.out.println("插入结果："+b);
+    }
+
+    @Test
+    public void testListAllbyName() {
+        List<User> users = userService.listAllByName("Tom");
+        users.forEach(System.out::println);
+    }
 
     @Test
     void testTokenizeQuery() {
@@ -72,7 +97,7 @@ public class ServiceTest {
     @Test
     void testFindDocsByQuery() {
         String query = "医院患者";
-        SearchResult searchResult = searchService.findDocsByQuery(query, "", 2);
+        SearchResult searchResult = searchService.findDocsByQuery(query, "", 2, 1);
         System.out.println(searchResult);
 
         Map<Integer, Double> keywords = new HashMap<>();
