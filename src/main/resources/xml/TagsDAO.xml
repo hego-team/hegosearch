@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.bytedance.hego.dao.TagsDAO">
     <select id="findAll" resultType="com.bytedance.hego.entity.Tags">
-        SELECT  id,owner,name,url from tags where owner=#{owner}
+        SELECT  id,owner,name,docid from tags where owner=#{owner}
     </select>
 
     <select id="findById" resultType="com.bytedance.hego.entity.Tags">
-        SELECT id, name,owner,url
+        SELECT id, name,owner,docid
         FROM tags
         WHERE id = #{id}
     </select>
 
     <select id="findByName" resultType="com.bytedance.hego.entity.Tags">
-        SELECT id, name,owner,url
+        SELECT id, name,owner,docid
         FROM tags
         WHERE name=#{name} AND owner=#{owner}
     </select>
@@ -31,13 +31,13 @@
         <trim prefix="(" suffixOverrides="," suffix=")">
             <if test="owner != null">owner, </if>
             <if test="name != null">name, </if>
-            <if test="url != null">url </if>
+            <if test="docid != null">docid </if>
             </trim>
 
         <trim prefix="VALUES (" suffixOverrides="," suffix=")">
             <if test="owner != null">#{owner}, </if>
             <if test="name != null">#{name}, </if>
-            <if test="url != null">#{url} </if>
+            <if test="docid != null">#{docid} </if>
         </trim>
     </insert>
 
@@ -46,7 +46,7 @@
         <set>
             <if test="name != null">name = #{name}, </if>
             <if test="owner != null">owner = #{owner}, </if>
-            <if test="url != null">url = #{url} </if>
+            <if test="docid != null">docid = #{docid} </if>
 
         </set>
         WHERE id = #{id}

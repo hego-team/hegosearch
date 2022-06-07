@@ -40,10 +40,10 @@ CREATE TABLE `tags` (
                         `id` int(11) NOT NULL AUTO_INCREMENT,
                         `owner` varchar(255) NOT NULL,
                         `name` varchar(255) NOT NULL,
-                        `url`  varchar(255) NOT NULL,
+                        `docid`  int(11) NOT NULL,
                         PRIMARY KEY (`id`)
 ) ;
-INSERT INTO `tags` VALUES ('1','Default','百度一下，也不知道','https://www.baidu.com');
+INSERT INTO `tags` VALUES ('1','Default','百度一下，也不知道','34');
 DROP TABLE IF EXISTS `his`;
 CREATE TABLE `his` (
                        `id` int(11) NOT NULL AUTO_INCREMENT,

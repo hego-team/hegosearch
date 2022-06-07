@@ -63,20 +63,20 @@ public class HisAction extends CommonAction {
 
    
     @PostMapping(value = "add")
-    public JsonResult add(String newcontent,HttpServletRequest request) {
+    public JsonResult add(String newquery,HttpServletRequest request) {
         // 新增条目。
         User user = getUserFromSession(request);
         if (user == null) {
             return new JsonResult(false);
         }
-        His his1=hisService.findByContent(user.getName(),newcontent);
+        His his1=hisService.findByContent(user.getName(),newquery);
         if(his1!=null){
             his1.setTimes(his1.getTimes()+1);
             hisService.save(his1);
             return new JsonResult(true);
         }
         His his=new His();
-        his.setContent(newcontent);his.setTimes(1);his.setOwner(user.getName());
+        his.setContent(newquery);his.setTimes(1);his.setOwner(user.getName());
         his =  hisService.add(his);
         if (his != null && his.getId() != null) {
             return new JsonResult(true);

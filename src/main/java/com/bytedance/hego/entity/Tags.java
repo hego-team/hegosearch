@@ -14,5 +14,5 @@ public class Tags {
     private Integer id;
     private String owner;
     private String name;
-    private String url;
+    private Integer docid;
 }
