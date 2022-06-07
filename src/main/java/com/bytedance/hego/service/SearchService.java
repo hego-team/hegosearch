@@ -157,16 +157,6 @@ public class SearchService {
      */
     public SearchResult findDocsByQuery(String query, String filter, int current, int limit) {
 
-
-        // 从缓存中取数据query::filter::current
-        String redisKey = RedisKeyUtil.getResultKey(query, filter, current, limit);
-        SearchResult cacheResult = getCache(redisKey);
-
-        if (cacheResult != null) {
-            return cacheResult;
-        }
-
-
         // 将query清洗分词得到keywords
         List<String> keywords = this.queryToKeywords(query);
 
@@ -208,32 +198,27 @@ public class SearchService {
         searchResult.setPage(page);
 
         // 如果查到的documents为0，开启拼写检查
-        // 否则将searchResult放入缓存
         if (ids.size() == 0) {
-            System.out.println(CheckByQuery(query));
             searchResult.setCheck(CheckByQuery(query));
-        }
-        else {
-            initCache(redisKey, searchResult);
         }
 
         return searchResult;
     }
 
     // 优先从缓存中取值
-    private SearchResult getCache(String redisKey) {
+    public SearchResult getCache(String redisKey) {
         return (SearchResult) redisServiceUtil.get(redisKey);
     }
 
     // 缓存中取不到时初始化缓存数据
-    private void initCache(String redisKey, SearchResult searchResult) {
+    public void initCache(String redisKey, SearchResult searchResult) {
         redisServiceUtil.set(redisKey, searchResult);
     }
 
     /**
      * 根据query查询提示词
-     * @param query
-     * @return
+     * @param query 用户输入
+     * @return prompts
      */
     public List<String> findPromptByQuery(String query) {
 

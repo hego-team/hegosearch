@@ -2,6 +2,7 @@ package com.bytedance.hego.Controller;
 
 import com.bytedance.hego.entity.SearchResult;
 import com.bytedance.hego.service.SearchService;
+import com.bytedance.hego.util.RedisKeyUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,17 +26,29 @@ public class SearchController {
                                         @RequestParam(value = "filter", required = false) String filter,
                                         @RequestParam(value = "page") int current,
                                         @RequestParam(value = "limit") int limit) {
+
+        long start = System.currentTimeMillis();
+
         if (filter == null) {
             filter = "";
         }
 
-        long start = System.currentTimeMillis();
-        SearchResult searchResult;
+        // 从缓存中取数据query::filter::current::limit
+        String redisKey = RedisKeyUtil.getResultKey(query, filter, current, limit);
+        SearchResult cacheResult = searchService.getCache(redisKey);
+        if (cacheResult != null) {
+            long end = System.currentTimeMillis();
+            cacheResult.setTime(end - start);
+            return cacheResult;
+        }
+
 
         // 翻译query中的英文
         String transQuery= searchService.transQuery(query.replaceAll(" ", ""));
-        searchResult = searchService.findDocsByQuery(transQuery, filter, current, limit);
+        SearchResult searchResult = searchService.findDocsByQuery(transQuery, filter, current, limit);
 
+        // 存入缓存
+        searchService.initCache(redisKey, searchResult);
 
         // 记录查询用时
         long end = System.currentTimeMillis();
@@ -56,11 +69,25 @@ public class SearchController {
             filter = "";
         }
 
+        // 图片转文字
         String query = searchService.imageToQuery(file);
+        // 从缓存中取数据query::filter::current::limit
+        String redisKey = RedisKeyUtil.getResultKey(query, filter, current, limit);
+        SearchResult cacheResult = searchService.getCache(redisKey);
+        if (cacheResult != null) {
+            long end = System.currentTimeMillis();
+            cacheResult.setTime(end - start);
+            return cacheResult;
+        }
+
         SearchResult searchResult = searchService.findDocsByQuery(query, filter, current, limit);
+
+        // 存入缓存
+        searchService.initCache(redisKey, searchResult);
 
         long end = System.currentTimeMillis();
         searchResult.setTime(end - start);
+
         return searchResult;
     }
 
