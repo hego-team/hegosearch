@@ -174,6 +174,7 @@ https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
 2. 数据量扩充
 
 
+
 ## 用户模块
 ### 功能清单
 1. 用户注册、登录、注销功能
@@ -235,18 +236,6 @@ GET http://localhost:8443/hego/logout
 - 无参数。
 - 退出当前账户。
 
-json示例：返回成功或错误信息。
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
-
-
 
 
 
@@ -284,20 +273,9 @@ json示例：
 
 DELETE http://localhost:8443/hego/user/delete
 
-- /
 
 - 无参数，注销当前用户。
 
-json示例：返回成功或失败信息
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
 
 
 
@@ -309,17 +287,6 @@ POST http://localhost:8443/hego/user/save?name=John&email=11111@qq.com
 
 - 根据当前session中用户id查找，修改名称、邮箱个人信息。
 
-json示例：返回成功或失败信息
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
-
 
 
 
@@ -330,16 +297,6 @@ PUT http://localhost:8443/hego/user/change_password?oldPass=111111&newPass=22222
 
 - 参数：旧密、新密、重复新密。
 
-json示例：返回成功或失败信息
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
 
 
 
@@ -357,16 +314,6 @@ POST http://localhost:8443/hego/tags/add?newname=哇咔咔&newdocid=344
 
 - 参数：新条目名称、新docID。
 
-返回json示例：返回成功或失败信息
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": "已添加到收藏夹",
-    "data": null
-}
-```
 
 
 
@@ -407,17 +354,6 @@ GET http://localhost:8443/hego/tags/list
 DELETE http://localhost:8443/hego/tags/delete?name=1111
 //按名称删除收藏夹项。
 
-返回json示例：返回成功或失败信息
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
-
 
 
 ##### 编辑收藏夹项
@@ -427,17 +363,6 @@ POST http://localhost:8443/hego/tags/save?oldname=百度一下，也不知道&ne
 - 编辑收藏夹项名称。
 
 - 此示例的数据是由sql脚本生成的初始数据，在Default用户的收藏夹内。
-
-返回json示例：返回成功或失败信息
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
 
 
 
@@ -456,33 +381,12 @@ POST http://localhost:8443/hego/his/add?newquery=1111
 - 可多次添加相同项通过times++计频数。
 - 添加条目到当前用户历史记录中。
 
-返回json示例：返回成功或失败（当前无用户登录），均无提示信息。
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
 
 ##### 删除
 
 DELETE http://localhost:8443/hego/his/delete?content=1111
 
 - 通过content项查询当前用户历史并删除。
-
-返回json示例：返回成功或失败提示信息。
-
-```json
-{
-    "code": null,
-    "success": true,
-    "msg": null,
-    "data": null
-}
-```
 
 
 
@@ -567,9 +471,6 @@ GET http://localhost:8443/hego/his/list/sort
     }
 }
 ```
-
-
-
 
 
 
