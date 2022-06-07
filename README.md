@@ -196,20 +196,6 @@ https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
 1. 使用session控制用户登录状态。
 2. 通过对用户表操作实现登录，登出，注册，注销（删号），改密，改信息。
 
-##### 打开页面
-
-GET http://localhost:8443/hego/
-
-没有前端，未实现。
-
-##### 进入已登录界面？
-
-GET http://localhost:8443/hego/admin
-
-没有前端，未实现。
-
-
-
 ##### 登录
 
 POST http://localhost:8443/hego/login?name=Default&password=Default
