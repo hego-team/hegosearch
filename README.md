@@ -1,5 +1,5 @@
-# HEGO-SEARCH
-search engine ，java implemention
+# HegoSearch
+image search engine
 
 ## 项目架构模块
 1. 推荐系统：实现搜索引擎，其抽象接口和ElasticSearch类似，可以认为是实现一个搜索引擎基础服务。
