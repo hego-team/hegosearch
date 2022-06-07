@@ -175,8 +175,415 @@ https://www.elastic.co/cn/elasticsearch/features#asynchronous-search
 
 
 ## 用户模块
-### 待完成
+### 功能清单
 1. 用户注册、登录、注销功能
 2. 用户收藏夹功能
 3. 用户搜索历史记录功能(option)
 4. 用户最常搜索功能(option)
+
+
+当前：收藏夹目录未实现。
+
+### 初始化
+
+1. 运行script/init_sql.sql文件初始化数据库数据。
+1. 改数据库的端口，用户名，密码配置。
+
+### 功能：
+
+### 用户相关请求：
+
+1. 使用session控制用户登录状态。
+2. 通过对用户表操作实现登录，登出，注册，注销（删号），改密，改信息。
+
+##### 打开页面
+
+GET http://localhost:8443/hego/
+
+没有前端，未实现。
+
+##### 进入已登录界面？
+
+GET http://localhost:8443/hego/admin
+
+没有前端，未实现。
+
+
+
+##### 登录
+
+POST http://localhost:8443/hego/login?name=Default&password=Default
+
+- 参数：用户名、密码。
+
+返回的json示例：（登录用户的全部的用户信息，role表示用户权限等级，目前没有用；lastLoginTime是上次登录时间，目前没有用；）
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "user": {
+            "id": 1,
+            "name": "Default",
+            "password": "Default",
+            "role": 1,
+            "email": "1111111111@qq.com",
+            "lastLoginTime": 1653955582967
+        }
+    }
+}
+```
+
+其他示例：
+
+http://localhost:8443/hego/login?name=John&password=111111
+
+
+
+##### 登出
+
+GET http://localhost:8443/hego/logout
+
+- 无参数。
+- 退出当前账户。
+
+json示例：返回成功或错误信息。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+##### 注册
+
+POST http://localhost:8443/hego/register?name=John&password=111111&rePassword=111111&email=john@163.com
+
+- 参数：用户名、密码、重复密码、邮箱信息（可选）
+
+json示例：
+
+（目前不能检查email格式；目前密码只有位数限制；用户名有非重复限制；成功返回用户信息；失败返回错误类型提示；通过注册只能添加0级普通账户；）
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "user": {
+            "id": 2,
+            "name": "John",
+            "password": "111111",
+            "role": 0,
+            "email": "john@163.com",
+            "lastLoginTime": 1653956412000
+        }
+    }
+}
+```
+
+
+
+##### 注销（删除）账户
+
+DELETE http://localhost:8443/hego/user/delete
+
+- /
+
+- 无参数，注销当前用户。
+
+json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+##### 改信息
+
+POST http://localhost:8443/hego/user/save?name=John&email=11111@qq.com
+
+- 根据当前session中用户id查找，修改名称、邮箱个人信息。
+
+json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+##### 改密
+
+PUT http://localhost:8443/hego/user/change_password?oldPass=111111&newPass=222222&reNewPass=222222
+
+- 参数：旧密、新密、重复新密。
+
+json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+### 收藏夹相关请求。 TAGS:
+
+1. 对数据表操作实现了收藏夹的增删改查。
+2. 条目有name不能重复限制，方便不根据id（主键）而根据name修改删除。
+3. 无用户登录状态不提供收藏功能。（如果意外发出收藏请求，返回信息”请先登录”）。
+
+##### 添加条目
+
+POST http://localhost:8443/hego/tags/add?newname=哇咔咔&newdocid=344
+
+- 参数：新条目名称、新docID。
+
+返回json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": "已添加到收藏夹",
+    "data": null
+}
+```
+
+
+
+##### 获得当前用户的收藏夹
+
+GET http://localhost:8443/hego/tags/list
+
+- 无参数。
+
+返回json示例：返回当前用户（owner）的所有收藏条目。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "docList": [
+            {
+                "docId": 34,
+                "content": "南,北掸邦军战事胶着 掸北昔卜镇难民人数已攀升至1600余人",
+                "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20181229%2F9f5a4a178f1c44aeabd4ee40fa1f27e1.jpeg&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630764501&t=7c6620ffa5c774d2d0d6d91547ab048e"
+            },
+            {
+                "docId": 233,
+                "content": "外婆去世后,孙子在她的车库里发现了一个巨大的保险柜,经过翻找他在",
+                "image": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180714%2F154e8fc560d449109b629f9de629c308.jpeg&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630585735&t=b60100d8875513553caf2ae44d3bb931"
+            }
+        ]
+    }
+}
+```
+
+
+
+##### 删除条目
+
+DELETE http://localhost:8443/hego/tags/delete?name=1111
+//按名称删除收藏夹项。
+
+返回json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+##### 编辑收藏夹项
+
+POST http://localhost:8443/hego/tags/save?oldname=百度一下，也不知道&newname=百度一下，你就知道
+
+- 编辑收藏夹项名称。
+
+- 此示例的数据是由sql脚本生成的初始数据，在Default用户的收藏夹内。
+
+返回json示例：返回成功或失败信息
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+
+
+### 历史记录相关请求。HIS：
+
+1. 通过操作数据库实现历史记录的增删查（两种）。
+2. 条目添加无限制。
+3. 无登录状态不保存历史记录。
+
+##### 搜索时自动触发添加
+
+POST http://localhost:8443/hego/his/add?newquery=1111
+
+- 可多次添加相同项通过times++计频数。
+- 添加条目到当前用户历史记录中。
+
+返回json示例：返回成功或失败（当前无用户登录），均无提示信息。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+##### 删除
+
+DELETE http://localhost:8443/hego/his/delete?content=1111
+
+- 通过content项查询当前用户历史并删除。
+
+返回json示例：返回成功或失败提示信息。
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": null
+}
+```
+
+
+
+##### 时间排序查看
+
+GET http://localhost:8443/hego/his/list/default
+
+- 返回按加入顺序（从早到晚，前端展示可能要逆序）排列的搜索历史记录。
+- 无参数，default表示默认顺序。
+- 只能查看当前用户的历史记录。
+
+返回json示例：
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "hisList": [
+            {
+                "id": 1,
+                "owner": "Default",
+                "content": "1111",
+                "times": 2
+            },
+            {
+                "id": 3,
+                "owner": "Default",
+                "content": "2222",
+                "times": 1
+            },
+            {
+                "id": 4,
+                "owner": "Default",
+                "content": "3333",
+                "times": 3
+            }
+        ]
+    }
+}
+```
+
+
+
+##### 频度排序查看
+
+GET http://localhost:8443/hego/his/list/sort
+
+- 返回按频度顺序（从高频到低频）排列的搜索历史记录。
+- 无参数，sort表示频度顺序。
+- 只能查看当前用户的历史记录。
+
+返回json示例：
+
+```json
+{
+    "code": null,
+    "success": true,
+    "msg": null,
+    "data": {
+        "hisList": [
+            {
+                "id": 4,
+                "owner": "Default",
+                "content": "3333",
+                "times": 3
+            },
+            {
+                "id": 1,
+                "owner": "Default",
+                "content": "1111",
+                "times": 2
+            },
+            {
+                "id": 3,
+                "owner": "Default",
+                "content": "2222",
+                "times": 1
+            }
+        ]
+    }
+}
+```
+
+
+
+
+
+
